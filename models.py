@@ -38,3 +38,5 @@ class Application(db.Model):
     application_id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer)
     scholarship_id = db.Column(db.Integer)
+    status = db.Column(db.String(50))
+    date_applied = db.Column(db.Date)
