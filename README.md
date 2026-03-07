@@ -1,3 +1,12 @@
-OVERVIEW
- 
- The proposed solution is a secure web-based application that enables students to submit, track, and manage their scholarship or financial aid applications online. The system will allow students to create accounts, complete application forms, upload required supporting documents and monitor the real-time status of their submissions for example Submitted, Under Review, Approved, Rejected. On the administrative side, authorized staff members will be able to review applications, verify documents, update application statuses, and provide feedback through a dedicated dashboard. The system will also include automated notifications via email or in-app alerts to inform students about important updates, missing documents, approval decisions, or deadlines. By centralizing all processes within a single digital platform, the application will reduce manual paperwork, minimize communication delays, and ensure a structured and transparent workflow.
+ Scholarship Tracker System
+
+This project is a web-based application developed to help students track 
+their scholarship applications in one place. The system allows students 
+to apply for scholarships, monitor application status, and receive updates. 
+Administrators can manage scholarship opportunities and review applications.
+
+Technologies used:
+- Python (Flask)
+- MySQL
+- HTML/CSS
+- SQLAlchemy
