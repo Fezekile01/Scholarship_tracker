@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Students</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .page { padding: 30px; }
+        .card { background: #fff; padding: 20px; border-radius: 14px; box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+        table { width:100%; border-collapse: collapse; }
+        th, td { padding:12px; border:1px solid #ddd; text-align:left; }
+        th { background:#e8f5e9; color:#1b5e20; }
+        .status-ok { color:#1b5e20; font-weight:bold; }
+        .status-missing { color:#c62828; font-weight:bold; }
+    </style>
+</head>
+<body class="dashboard-page">
+    <div class="topbar">
+        <h1>Manage Students</h1>
+        <a href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
+    </div>
+
+    <div class="page">
+        <div class="card">
+            <h2>Registered Students</h2>
+            {% if students %}
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Student #</th>
+                    <th>Course</th>
+                    <th>Year</th>
+                    <th>Profile Docs</th>
+                </tr>
+                {% for s in students %}
+                {% set doc = profile_docs.get(s.id) %}
+                <tr>
+                    <td>{{ s.user.full_name }}</td>
+                    <td>{{ s.user.email }}</td>
+                    <td>{{ s.student_number or '-' }}</td>
+                    <td>{{ s.course or '-' }}</td>
+                    <td>{{ s.year_level or '-' }}</td>
+                    <td>
+                        {% if s.profile_documents %}
+                            <span class="status-ok">Uploaded</span>
+                        {% else %}
+                            <span class="status-missing">Missing</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% else %}
+                <p>No students registered.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
+
