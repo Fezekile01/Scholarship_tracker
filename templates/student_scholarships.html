@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Scholarships</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .table-wrapper { padding: 30px; }
+        .notice { margin-bottom: 16px; color: #1b5e20; font-weight: bold; }
+        .error { color: #c62828; }
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        th { background: #e8f5e9; color: #1b5e20; }
+        .apply-btn { padding: 8px 12px; background: #1b5e20; color: white; border: none; border-radius: 6px; cursor: pointer; }
+        .apply-btn:disabled { background: #9e9e9e; cursor: not-allowed; }
+        .topbar a { color: #ffd54f; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body class="dashboard-page">
+    <div class="topbar">
+        <h1>Available Scholarships</h1>
+        <a href="{{ url_for('student_dashboard') }}">Back to Dashboard</a>
+    </div>
+
+    <div class="table-wrapper">
+        {% if message %}
+            <div class="notice">{{ message }}</div>
+        {% endif %}
+
+        {% if scholarships %}
+            <table>
+                <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Requirements</th>
+                    <th>Deadline</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+                {% for scholarship in scholarships %}
+                {% set already_applied = scholarship.id in existing_applications %}
+                <tr>
+                    <td>{{ scholarship.title }}</td>
+                    <td>{{ scholarship.description }}</td>
+                    <td>{{ scholarship.requirements }}</td>
+                    <td>{{ scholarship.deadline }}</td>
+                    <td>{{ scholarship.status }}</td>
+                    <td>
+                        <form method="post" action="{{ url_for('apply_scholarship', scholarship_id=scholarship.id) }}">
+                            <button class="apply-btn" type="submit" {% if already_applied %}disabled{% endif %}>
+                                {{ 'Applied' if already_applied else 'Apply' }}
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>No scholarships are currently available.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

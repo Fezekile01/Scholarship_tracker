@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="dashboard-page">
+    <div class="topbar">
+        <div class="menu-icon" onclick="toggleMenu()" aria-label="Toggle menu">
+            &#9776; <span style="font-size:14px; font-weight:bold;">Menu</span>
+        </div>
+        <h1>Student Dashboard</h1>
+        <div class="topbar-actions">
+            <a class="profile-avatar" href="{{ url_for('student_profile') }}" aria-label="Student Profile">
+                <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="32" cy="22" r="14" fill="#ffd54f" />
+                    <path d="M12 56c0-11 9-20 20-20s20 9 20 20" fill="#ffd54f" />
+                </svg>
+            </a>
+            <a class="logout-link" href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </div>
+
+    <div class="dashboard-wrapper">
+        <div class="sidebar" id="sidebar">
+            <h3>Student Menu</h3>
+            <ul>
+                <li><a href="{{ url_for('student_dashboard') }}">Dashboard Home</a></li>
+                <li><a href="{{ url_for('student_scholarships') }}">Available Scholarships</a></li>
+                <li><a href="{{ url_for('student_scholarships') }}">Apply for Scholarship</a></li>
+                <li><a href="{{ url_for('track_applications') }}">Track Application Status</a></li>
+                <li><a href="{{ url_for('student_notifications') }}">Notifications</a></li>
+            </ul>
+        </div>
+
+        <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleMenu()"></div>
+
+        <div class="main-content">
+            <div class="welcome-box">
+                <h2>Welcome, {{ name }}</h2>
+                <p>Manage your scholarship applications and keep track of every update.</p>
+            </div>
+
+            <div class="card-grid">
+                <div class="dashboard-card actionable" onclick="window.location.href='{{ url_for('student_scholarships') }}'">
+                    <h3>Available Scholarships</h3>
+                    <p>Browse all open scholarships and funding opportunities available for students.</p>
+                </div>
+                <div class="dashboard-card actionable" onclick="window.location.href='{{ url_for('track_applications') }}'">
+                    <h3>My Applications</h3>
+                    <p>View the applications you have submitted and check their progress.</p>
+                </div>
+                <div class="dashboard-card actionable" onclick="window.location.href='{{ url_for('student_notifications') }}'">
+                    <h3>Notifications</h3>
+                    <p>Read updates about approvals, rejections, and requests for missing documents.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            var sidebar = document.getElementById("sidebar");
+            var overlay = document.getElementById("sidebar-overlay");
+            sidebar.classList.toggle("active");
+            overlay.classList.toggle("active");
+        }
+        document.addEventListener('DOMContentLoaded', function(){
+            var sidebarLinks = document.querySelectorAll('#sidebar a');
+            var sidebar = document.getElementById("sidebar");
+            var overlay = document.getElementById("sidebar-overlay");
+            sidebarLinks.forEach(function(link){
+                link.addEventListener('click', function(){
+                    sidebar.classList.remove("active");
+                    overlay.classList.remove("active");
+                });
+            });
+        });
+    </script>
+</body>
+</html>

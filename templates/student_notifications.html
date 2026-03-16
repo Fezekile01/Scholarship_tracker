@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .notice-list { padding: 30px; }
+        .note { background: white; padding: 16px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 12px; }
+    </style>
+</head>
+<body class="dashboard-page">
+    <div class="topbar">
+        <h1>Notifications</h1>
+        <a href="{{ url_for('student_dashboard') }}">Back to Dashboard</a>
+    </div>
+
+    <div class="notice-list">
+        {% if notifications %}
+            {% for note in notifications %}
+                <div class="note">{{ note.message }}</div>
+            {% endfor %}
+        {% else %}
+            <p>No notifications yet.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

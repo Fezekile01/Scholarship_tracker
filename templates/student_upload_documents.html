@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Documents</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .upload-wrapper { padding: 30px; }
+        form { margin-bottom: 20px; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        input[type=file] { margin-bottom: 10px; }
+        button { background: #1b5e20; color: white; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; }
+        .notice { margin-bottom: 14px; font-weight: bold; }
+        .error { color: #c62828; }
+        .doc-list { background: white; padding: 16px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .doc-item { padding: 10px 0; border-bottom: 1px solid #eee; }
+        .doc-item:last-child { border-bottom: none; }
+    </style>
+</head>
+<body class="dashboard-page">
+    <div class="topbar">
+        <h1>Upload Documents</h1>
+        <a href="{{ url_for('student_dashboard') }}">Back to Dashboard</a>
+    </div>
+
+    <div class="upload-wrapper">
+        {% if message %}
+            <div class="notice">{{ message }}</div>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data">
+            <label for="document">Choose a file to upload:</label><br>
+            <input type="file" name="document" id="document" required>
+            <button type="submit">Upload</button>
+        </form>
+
+        <div class="doc-list">
+            <h3>Your Documents</h3>
+            {% if documents %}
+                {% for doc in documents %}
+                    <div class="doc-item">
+                        <a href="{{ url_for('static', filename='uploads/' + doc.filename) }}" target="_blank">{{ doc.filename }}</a>
+                        <span style="color:#777; font-size: 14px;">Uploaded {{ doc.uploaded_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No documents uploaded yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

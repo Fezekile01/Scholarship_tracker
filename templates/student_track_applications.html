@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Applications</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .table-wrapper { padding: 30px; }
+        .notice { margin-bottom: 16px; color: #1b5e20; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        th { background: #e8f5e9; color: #1b5e20; }
+    </style>
+</head>
+<body class="dashboard-page">
+    <div class="topbar">
+        <h1>My Applications</h1>
+        <a href="{{ url_for('student_dashboard') }}">Back to Dashboard</a>
+    </div>
+
+    <div class="table-wrapper">
+        {% if message %}
+            <div class="notice">{{ message }}</div>
+        {% endif %}
+
+        {% if applications %}
+            <table>
+                <tr>
+                    <th>Scholarship</th>
+                    <th>Status</th>
+                </tr>
+                {% for application in applications %}
+                <tr>
+                    <td>{{ application.scholarship.title }}</td>
+                    <td>{{ application.status }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>You have not submitted any applications yet.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
