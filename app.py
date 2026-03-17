@@ -16,6 +16,11 @@ db.init_app(app)
 
 
 
+
+@app.route("/")
+def index():
+    scholarships = Scholarship.query.filter_by(status='Open').all()
+    return render_template('index.html', scholarships=scholarships)
 # -----------------------------
 # HOME ROUTE
 # -----------------------------
@@ -41,22 +46,29 @@ def register():
         full_name = request.form['full_name']
         email = request.form['email']
         password = request.form['password']
+        # Catch the department from the dropdown
+        selected_dept = request.form['course'] 
 
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
             return "Email already exists. Please use another email."
 
+        # Create the base User
         new_user = User(
             full_name=full_name,
             email=email,
-            password_hash=password,
+            password_hash=password, # Note: In a real app, use werkzeug.security to hash this!
             role='student'
         )
 
         db.session.add(new_user)
         db.session.commit()
 
-        new_student = Student(user_id=new_user.id)
+        # Create the Student profile and link the department/course
+        new_student = Student(
+            user_id=new_user.id,
+            course=selected_dept  # This maps to the 'department' column in your Student model
+        )
         db.session.add(new_student)
         db.session.commit()
 
@@ -124,12 +136,15 @@ def student_scholarships():
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
-    if session.get('role') != 'student':
-        return "Access denied"
-
     student = Student.query.filter_by(user_id=session['user_id']).first()
-    _refresh_scholarship_statuses()
-    scholarships = Scholarship.query.filter(Scholarship.status != 'Closed').all()
+    student_dept = student.course 
+
+   
+    scholarships = Scholarship.query.filter(
+        Scholarship.status != 'Closed',
+        Scholarship.department == student_dept
+    ).all()
+
     existing_applications = {app.scholarship_id for app in student.applications}
 
     return render_template(
@@ -137,6 +152,7 @@ def student_scholarships():
         scholarships=scholarships,
         existing_applications=existing_applications,
         message=request.args.get('message')
+    
     )
 
 
@@ -505,12 +521,18 @@ def admin_scholarships():
         requirements = request.form['requirements']
         deadline = request.form['deadline']
         status = request.form['status']
+        dept_code = request.form.get('department')
+
+       
+
         new_scholarship = Scholarship(
             title=title,
             description=description,
             requirements=requirements,
             deadline=deadline,
-            status=status
+            status=status,
+            department=dept_code
+            
         )
         db.session.add(new_scholarship)
         db.session.commit()
