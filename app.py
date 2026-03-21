@@ -88,8 +88,12 @@ def login():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
+        consent = request.form['consent']
 
         user = User.query.filter_by(email=email).first()
+      if not consent:
+            error = "You must accept the Privacy Policy"
+            return render_template('login.html', error=error)
 
         if user and user.password_hash == password:
             session['user_id'] = user.id
