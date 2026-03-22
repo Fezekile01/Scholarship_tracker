@@ -1,1 +1,745 @@
+* {
 
+    margin: 0;
+
+    padding: 0;
+
+    box-sizing: border-box;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+}
+
+
+
+body.login-page {
+
+    min-height: 100vh;
+
+    background: url("../images/student-bg.png") no-repeat center center/cover;
+
+    position: relative;
+
+}
+
+
+
+
+
+
+
+.login-container {
+
+    position: relative;
+
+    z-index: 2;
+
+    display: flex;
+
+    min-height: 100vh;
+
+}
+
+
+
+.login-left,
+
+.login-right {
+
+    flex: 1;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 40px;
+
+}
+
+
+
+.branding {
+
+    max-width: 500px;
+
+    color: white;
+
+}
+
+
+
+.branding h1 {
+
+    font-size: 48px;
+
+    margin-bottom: 20px;
+
+    color: white;
+
+}
+
+
+
+.branding p {
+
+    font-size: 18px;
+
+    line-height: 1.7;
+
+    color: #ffffff;
+
+}
+
+
+
+.login-card {
+
+    width: 100%;
+
+    max-width: 420px;
+
+    background: rgba(255, 255, 255, 0.96);
+
+    padding: 35px;
+
+    border-radius: 18px;
+
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+
+}
+
+
+
+.login-card h2 {
+
+    color: #03045e;
+
+    font-size: 30px;
+
+    margin-bottom: 8px;
+
+}
+
+
+
+.subtitle {
+
+    color: #666;
+
+    margin-bottom: 25px;
+
+}
+
+
+
+.form-group {
+
+    margin-bottom: 18px;
+
+}
+
+
+
+.form-group label {
+
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #03045e;
+
+    font-weight: bold;
+
+}
+
+
+
+.form-group input {
+
+    width: 100%;
+
+    padding: 13px;
+
+    border: 1px solid #cfcfcf;
+
+    border-radius: 10px;
+
+    outline: none;
+
+    font-size: 15px;
+
+}
+
+
+
+.form-group input:focus {
+
+    border-color: #fbc02d;
+
+    box-shadow: 0 0 6px rgba(251, 192, 45, 0.45);
+
+}
+
+
+
+.login-btn {
+
+    width: 100%;
+
+    padding: 14px;
+
+    background: linear-gradient(90deg, #023e8a, #48cae4);
+
+    color: white;
+
+    border: none;
+
+    border-radius: 10px;
+
+    font-size: 17px;
+
+    cursor: pointer;
+
+    font-weight: bold;
+
+    margin-top: 10px;
+
+}
+
+
+
+.login-btn:hover {
+
+    opacity: 0.92;
+
+}
+
+
+
+.bottom-text {
+
+    margin-top: 18px;
+
+    text-align: center;
+
+    color: #444;
+
+}
+
+
+
+.bottom-text a {
+
+    color: #4361ee;
+
+    font-weight: bold;
+
+    text-decoration: none;
+
+}
+
+
+
+.bottom-text a:hover {
+
+    text-decoration: underline;
+
+}
+
+
+
+.error-message {
+
+    background: #ffebee;
+
+    color: #c62828;
+
+    padding: 12px;
+
+    border-radius: 8px;
+
+    margin-bottom: 18px;
+
+    font-size: 14px;
+
+}
+
+
+
+body.dashboard-page {
+
+    background: #e7ecef;
+
+    min-height: 100vh;
+
+}
+
+.notification-toast {
+        position: fixed;
+        top: 90px;
+        right: 20px;
+        width: 320px;
+        background: white;
+        color: #1b5e20;
+        border-left: 6px solid #fbc02d;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
+        padding: 16px 18px;
+        z-index: 9999;
+        opacity: 0;
+        transform: translateX(30px);
+        transition: opacity 0.4s ease, transform 0.4s ease;
+        pointer-events: none;
+    }
+
+    .notification-toast.show {
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: auto;
+    }
+
+    .notification-toast h4 {
+        margin: 0 0 8px 0;
+        color: #1b5e20;
+        font-size: 16px;
+    }
+
+    .notification-toast p {
+        margin: 0;
+        color: #444;
+        line-height: 1.5;
+        font-size: 14px;
+    }
+
+    .notification-toast:hover {
+        cursor: pointer;
+        background: #f9fff9;
+    }
+
+.topbar {
+
+    display: flex;
+
+    justify-content: space-between; /* This pushes <h1> left and .topbar-actions right */
+
+    align-items: center;
+
+    padding: 0 20px;
+
+    background-color: #03045e; /* Matching your theme */
+
+    color: #ffffff;
+
+    height: 60px;
+
+}
+
+
+
+
+
+.topbar h1 {
+
+    font-size: 24px;
+
+}
+
+
+
+.topbar a {
+
+    color: #ffffff;
+
+    text-decoration: none;
+
+    font-weight: bold;
+
+}
+
+
+
+.dashboard-wrapper {
+
+    position: relative;
+
+    min-height: calc(100vh - 70px);
+
+}
+
+
+
+.sidebar {
+
+    position: fixed;
+
+    top: 70px;
+
+    left: -280px;
+
+    width: 260px;
+
+    height: calc(100% - 70px);
+
+    background: white;
+
+    padding: 25px;
+
+    box-shadow: 2px 0 16px rgba(0, 0, 0, 0.12);
+
+    overflow-y: auto;
+
+    transition: left 0.3s ease;
+
+    z-index: 1100;
+
+}
+
+
+
+.sidebar.active {
+
+    left: 0;
+
+}
+
+
+
+.sidebar h3 {
+
+    color: #1b5e20;
+
+    margin-bottom: 20px;
+
+}
+
+
+
+.sidebar ul {
+
+    list-style: none;
+
+}
+
+
+
+.sidebar ul li {
+
+    margin-bottom: 12px;
+
+}
+
+
+
+.sidebar ul li a {
+
+    text-decoration: none;
+
+    color: #333;
+
+    display: block;
+
+    padding: 12px;
+
+    border-radius: 8px;
+
+    background: #f9fff9;
+
+}
+
+
+
+.sidebar ul li a:hover {
+
+    background: #e8f5e9;
+
+    color: #1b5e20;
+
+}
+
+
+
+.main-content {
+
+    padding: 30px;
+
+}
+
+
+
+.welcome-box {
+    position: relative;
+    background: url("../images/welcome2.jpg");
+    Background-repeat: no-repeat;
+    Background-position: center;
+    background-size: cover;
+
+    color: #000;
+    padding: 100px 35px;
+    border-radius: 18px;
+    margin-bottom: 25px;
+    min-height: 200px;
+    width: 100%;
+    max-width: 2000px;
+    overflow: hidden;
+}
+
+.welcome-box::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.10);/* dark overlay */
+    border-radius: 18px;
+}
+
+.welcome-box h2,
+.welcome-box p {
+    position: relative;
+    z-index: 1;
+    color: #001d3d;
+    font-size: x-large;
+   
+}
+
+.card-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+
+    gap: 20px;
+    
+   
+
+}
+
+
+
+.dashboard-card {
+
+    background: #ede7e3;
+
+    padding: 22px;
+
+    border-radius: 18px;
+
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+
+    min-height: 260px;
+
+}
+
+
+
+.dashboard-card h3 {
+
+    color: #1b5e20;
+
+    margin-bottom: 10px;
+
+    font-size: 18px;
+
+}
+
+
+
+.dashboard-card p {
+
+    color: #555;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+
+}
+
+
+.scholarship-card {
+    position: relative;
+    background: #fffffa;
+    border-radius: 18px;
+    padding: 26px 24px 24px 24px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    min-height: 350px;
+    max-width: 100%;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.scholarship-card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0px;
+    bottom: 0px;
+    width: 10px;
+    border-radius: 0 10px 10px 0;
+    background: #0096c7;
+}
+
+.scholarship-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.12);
+}
+
+.card-icon-wrap {
+    margin-bottom: 18px;
+    padding-left: 12px;
+}
+
+.card-icon-wrap img {
+    width: 84px;
+    height: 84px;
+    object-fit: contain;
+    display: block;
+}
+
+.scholarship-card h3 {
+    margin: 0 0 12px 0;
+    font-size: 18px;
+    color: #333;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.scholarship-card p {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.7;
+    color: #666;
+}
+
+.card-action {
+    margin-top: auto;
+}
+
+
+
+
+.menu-icon {
+
+    font-size: 24px;
+
+    line-height: 1;
+
+    color: white;
+
+}
+
+
+
+@media (max-width: 900px) {
+
+    .login-container {
+
+        flex-direction: column;
+
+    }
+
+
+
+    .login-left {
+
+        padding-bottom: 0;
+
+    }
+
+
+
+    .branding h1 {
+
+        font-size: 36px;
+
+    }
+
+
+
+    .sidebar {
+
+        top: 0;
+
+        height: 100%;
+
+    }
+
+}
+
+
+
+.sidebar-overlay {
+
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(0,0,0,0.4);
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transition: opacity 0.3s ease;
+
+    z-index: 1050;
+
+}
+
+
+
+.sidebar-overlay.active {
+
+    opacity: 1;
+
+    pointer-events: auto;
+
+}
+
+.dashboard-card.actionable{
+
+    cursor:pointer;
+
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+}
+
+.dashboard-card.actionable:hover{
+
+    transform: translateY(-3px);
+
+    box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+
+}
+
+
+
+.topbar-actions {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px; /* Adds space between Menu, Avatar, and Logout */
+
+}
+
+
+
+
+
+.profile-avatar{width:40px;height:40px;border-radius:50%;background:#00b4d8;display:flex;align-items:center;justify-content:center;text-decoration:none;}
+
+.profile-avatar svg{width:26px;height:26px;}
+
+.profile-avatar:hover{opacity:0.9;}
+
+.logout-link{text-decoration:none;color:#ffffff;font-weight:bold;}
+
+
+
+
+
+.topbar a {color:#ffffff;text-decoration:none;font-weight:bold;}
