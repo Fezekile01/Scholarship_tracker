@@ -6,28 +6,37 @@
     <title>Administrator Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
-        body { margin:0; font-family: Arial, Helvetica, sans-serif; background:#edf5ee; }
-        .topbar { background:#1b5e20; color:white; padding:22px 35px; display:flex; justify-content:space-between; align-items:center; }
+        body { margin:0; font-family: Arial, Helvetica, sans-serif; background:#e9f5db; }
+        .topbar { background:#132a13; color:white; padding:22px 35px; display:flex; justify-content:space-between; align-items:center; }
         .topbar h1 { margin:0; font-size:28px; }
         .topbar a { color:#ffd54f; text-decoration:none; font-weight:bold; font-size:18px; }
         .dashboard-wrapper { display:flex; min-height:calc(100vh - 76px); }
-        .sidebar { width:270px; background:#f5f7f5; padding:30px; box-shadow:2px 0 10px rgba(0,0,0,0.05); }
-        .sidebar h3 { color:#1b5e20; margin-bottom:20px; font-size:24px; }
-        .sidebar ul { list-style:none; padding:0; margin:0; }
-        .sidebar ul li { margin-bottom:14px; }
-        .sidebar ul li a { text-decoration:none; color:#1b5e20; font-weight:bold; display:block; padding:12px 14px; background:#e8f5e9; border-radius:10px; transition:0.3s ease; }
-        .sidebar ul li a:hover { background:#c8e6c9; }
+        
         .main-content { flex:1; padding:40px; }
-        .welcome-box { background:linear-gradient(90deg, #2e7d32, #fbc02d); color:white; padding:30px; border-radius:22px; margin-bottom:30px; }
-        .welcome-box h2 { margin:0 0 10px 0; font-size:28px; }
-        .welcome-box p { margin:0; font-size:18px; line-height:1.6; }
+        .welcome-box { position: relative;
+                        background: url("../static/images/welcome.jpg");
+                        Background-repeat: no-repeat;
+                        Background-position: center;
+                        background-size: cover;
+
+                        color: #000;
+                        padding: 100px 35px;
+                        border-radius: 18px;
+                        margin-bottom: 25px;
+                        min-height: 200px;
+                        width: 100%;
+                        max-width: 2000px;
+                        overflow: hidden;}
+        
+        .welcome-box h2 { margin:0 0 10px 0; font-size:28px; color: white}
+        .welcome-box p { margin:0; font-size:18px; line-height:1.6; color:white}
         .card-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:25px; }
-        .dashboard-card { background:white; padding:28px; border-radius:18px; box-shadow:0 6px 18px rgba(0,0,0,0.08); border-left:6px solid #fbc02d; }
-        .dashboard-card h3 { color:#1b5e20; margin-bottom:12px; font-size:22px; }
+        .dashboard-card { background:white; padding:28px; border-radius:18px; box-shadow:0 6px 18px rgba(0,0,0,0.08); border-left:8px solid #6a994e; }
+        .dashboard-card h3 { color:#31572c; margin-bottom:12px; font-size:22px; }
         .dashboard-card p { color:#444; line-height:1.6; margin-bottom:15px; }
-        .dashboard-card a { display:inline-block; margin-top:10px; color:#1b5e20; font-weight:bold; text-decoration:none; }
+        .dashboard-card a { display:inline-block; margin-top:10px; color:#5f61d6; font-weight:bold; text-decoration:none; }
         .dashboard-card a:hover { text-decoration:underline; }
-        @media (max-width: 900px) { .dashboard-wrapper { flex-direction:column; } .sidebar { width:100%; } }
+        @media (max-width: 900px) { .dashboard-wrapper { flex-direction:column; } }
     </style>
 </head>
 <body>
@@ -43,7 +52,7 @@
                 <li><a href="{{ url_for('admin_dashboard') }}">Dashboard Home</a></li>
                 <li><a href="{{ url_for('admin_scholarships') }}">Create & Manage Scholarships</a></li>
                 <li><a href="{{ url_for('view_applications') }}">View Applications</a></li>
-                <li><a href="{{ url_for('approve_reject') }}">Approve / Reject Applications</a></li>
+                <li><a href="{{ url_for('manage_applications') }}">Approve / Reject Applications</a></li>
                 <li><a href="{{ url_for('admin_missing_documents') }}">Request Missing Documents</a></li>
                 <li><a href="{{ url_for('admin_notifications') }}">Notifications</a></li>
                 <li><a href="{{ url_for('manage_students') }}">Manage Students</a></li>
@@ -58,7 +67,7 @@
 
             <div class="card-grid">
                 <div class="dashboard-card actionable" onclick="window.location.href='{{ url_for('admin_scholarships') }}'">
-                    <h3>Create & Manage Scholarships</h3>
+                     <h3>Manage Scholarships</h3>
                     <p>View, monitor, and manage all scholarships stored in the system.</p>
                 </div>
 
@@ -67,21 +76,15 @@
                     <p>Check all applications submitted by students for available scholarships.</p>
                 </div>
 
-                <div class="dashboard-card actionable" onclick="window.location.href='{{ url_for('admin_notifications') }}'">
-                    <h3>Notifications</h3>
-                    <p>Read important system updates and admin alerts.</p>
-                </div>
-
-                <div class="dashboard-card actionable" onclick="window.location.href='{{ url_for('approve_reject') }}'">
+                <div class="dashboard-card actionable" onclick="window.location.href='{{ url_for('manage_applications') }}'">
                     <h3>Manage Applications</h3>
                     <p>Review applications and decide whether to approve or reject them.</p>
                 </div>
-
-                <div class="dashboard-card actionable" onclick="window.location.href='{{ url_for('admin_missing_documents') }}'">
-                    <h3>Request Missing Documents</h3>
-                    <p>Request outstanding supporting documents from students.</p>
+                
+                 <div class="dashboard-card actionable" onclick="window.location.href='{{ url_for('admin_notifications') }}'">
+                    <h3>Notifications</h3>
+                    <p>Read important system updates and admin alerts.</p>
                 </div>
-
                 <div class="dashboard-card actionable" onclick="window.location.href='{{ url_for('manage_students') }}'">
                     <h3>Manage Students</h3>
                     <p>Monitor registered student accounts and related system activity.</p>

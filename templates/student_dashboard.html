@@ -7,21 +7,21 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body class="dashboard-page">
-    <div class="topbar">
-        <div class="menu-icon" onclick="toggleMenu()" aria-label="Toggle menu">
-            &#9776; <span style="font-size:14px; font-weight:bold;">Menu</span>
-        </div>
-        <h1>ScholarMates</h1>
-        <div class="topbar-actions">
-            <a class="profile-avatar" href="{{ url_for('student_profile') }}" aria-label="Student Profile">
-                <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="32" cy="22" r="14" fill="#ffd54f" />
-                    <path d="M12 56c0-11 9-20 20-20s20 9 20 20" fill="#ffd54f" />
-                </svg>
-            </a>
-            <a class="logout-link" href="{{ url_for('logout') }}">Logout</a>
+   <div class="topbar">
+    <h1>ScholarMates</h1>
+    <div class="topbar-actions">
+        <a class="profile-avatar" href="{{ url_for('student_profile') }}" aria-label="Student Profile">
+            <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="32" cy="22" r="14" fill="#ffd54f" />
+                <path d="M12 56c0-11 9-20 20-20s20 9 20 20" fill="#ffd54f" />
+            </svg>
+        </a>
+        <a class="logout-link" href="{{ url_for('logout') }}">Logout</a>
+        <div class="menu-icon" onclick="toggleMenu()" aria-label="Toggle menu" style="cursor: pointer; margin-left: 5px;">
+            &#9776; 
         </div>
     </div>
+</div>
 
     <div class="dashboard-wrapper">
         <div class="sidebar" id="sidebar">
@@ -29,35 +29,53 @@
             <ul>
                 <li><a href="{{ url_for('student_dashboard') }}">Dashboard Home</a></li>
                 <li><a href="{{ url_for('student_scholarships') }}">Available Scholarships</a></li>
-                <li><a href="{{ url_for('student_scholarships') }}">Apply for Scholarship</a></li>
                 <li><a href="{{ url_for('track_applications') }}">Track Application Status</a></li>
                 <li><a href="{{ url_for('student_notifications') }}">Notifications</a></li>
             </ul>
         </div>
 
         <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleMenu()"></div>
+<div class="main-content">
+    <div class="welcome-box">
+        <h2>Welcome, {{ name }}</h2>
+        <p>Manage your scholarship applications and keep track of every update.</p>
+    </div>
 
-        <div class="main-content">
-            <div class="welcome-box">
-                <h2>Welcome, {{ name }}</h2>
-                <p>Manage your scholarship applications and keep track of every update.</p>
+    <div class="card-grid">
+        <div class="dashboard-card scholarship-card actionable" onclick="window.location.href='{{ url_for('student_scholarships') }}'">
+            <div class="card-icon-wrap">
+                <img src="{{ url_for('static', filename='images/scholarship.png') }}" alt="Available Scholarships">
             </div>
-
-            <div class="card-grid">
-                <div class="dashboard-card actionable" onclick="window.location.href='{{ url_for('student_scholarships') }}'">
-                    <h3>Available Scholarships</h3>
-                    <p>Browse all open scholarships and funding opportunities available for students.</p>
-                </div>
-                <div class="dashboard-card actionable" onclick="window.location.href='{{ url_for('track_applications') }}'">
-                    <h3>My Applications</h3>
-                    <p>View the applications you have submitted and check their progress.</p>
-                </div>
-                <div class="dashboard-card actionable" onclick="window.location.href='{{ url_for('student_notifications') }}'">
-                    <h3>Notifications</h3>
-                    <p>Read updates about approvals, rejections, and requests for missing documents.</p>
-                </div>
+            <h3>Available Scholarships</h3>
+            <p>Browse and apply for the latest scholarships matched to your profile.</p>
+            <div class="card-action">
+                
             </div>
         </div>
+
+        <div class="dashboard-card scholarship-card actionable" onclick="window.location.href='{{ url_for('track_applications') }}'">
+            <div class="card-icon-wrap">
+                <img src="{{ url_for('static', filename='images/track.png') }}" alt="Track Scholarships">
+            </div>
+            <h3>Track Scholarships</h3>
+            <p>Monitor the status of your scholarship applications and manage deadlines.</p>
+            <div class="card-action">
+                
+            </div>
+        </div>
+
+        <div class="dashboard-card scholarship-card actionable" onclick="window.location.href='{{ url_for('student_notifications') }}'">
+            <div class="card-icon-wrap">
+                <img src="{{ url_for('static', filename='images/notification.png') }}" alt="Notifications">
+            </div>
+            <h3>Notifications</h3>
+            <p>Stay updated with important alerts and messages regarding your scholarships.</p>
+            <div class="card-action">
+                
+            </div>
+        </div>
+    </div>
+</div>
     </div>
 
     <script>
@@ -78,6 +96,85 @@
                 });
             });
         });
+
+     let audioUnlocked = false;
+
+    function unlockAudio() {
+        audioUnlocked = true;
+        document.removeEventListener('click', unlockAudio);
+        document.removeEventListener('keydown', unlockAudio);
+    }
+
+    document.addEventListener('click', unlockAudio);
+    document.addEventListener('keydown', unlockAudio);
+
+    function playBellSound() {
+        if (!audioUnlocked) return;
+
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(880, audioContext.currentTime);
+
+            gainNode.gain.setValueAtTime(0.0001, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.25, audioContext.currentTime + 0.02);
+            gainNode.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.6);
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.6);
+        } catch (error) {
+            console.log('Bell sound could not play:', error);
+        }
+    }
+
+    function showNotificationToast(message) {
+        const toast = document.getElementById('notificationToast');
+        const toastMessage = document.getElementById('notificationToastMessage');
+
+        toastMessage.textContent = message;
+        toast.classList.add('show');
+        playBellSound();
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3000);
+    }
+
+    async function checkLatestNotification() {
+        try {
+            const response = await fetch('/student/latest_notification');
+            const data = await response.json();
+
+            if (!data.notification) return;
+
+            const latestId = data.notification.id;
+            const latestMessage = data.notification.message;
+
+            const lastSeenId = localStorage.getItem('lastSeenStudentNotificationId');
+
+            if (!lastSeenId || parseInt(latestId) > parseInt(lastSeenId)) {
+                showNotificationToast(latestMessage);
+                localStorage.setItem('lastSeenStudentNotificationId', latestId);
+            }
+        } catch (error) {
+            console.log('Could not fetch latest notification:', error);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        checkLatestNotification();
+        setInterval(checkLatestNotification, 10000);
+    });   
     </script>
+<div id="notificationToast" class="notification-toast" onclick="window.location.href='{{ url_for('student_notifications') }}'">
+    <h4>New Notification</h4>
+    <p id="notificationToastMessage"></p>
+</div>
 </body>
 </html>

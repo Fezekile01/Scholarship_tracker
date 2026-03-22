@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Notifications</title>
+    <title>View Submissions</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
         .topbar {
@@ -56,7 +56,7 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: #00b4d8;
+            background: #90a955;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -68,61 +68,69 @@
             height: 26px;
         }
     
-        .notification-page {
-            padding: 40px;
+        
+        .page {
+            padding: 30px;
         }
 
-        .notification-card {
-            background: white;
-            padding: 25px;
-            border-radius: 16px;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-            margin-bottom: 15px;
-            border-left: 6px solid #fbc02d;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
+        .card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 14px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.08);
         }
 
-        .notification-card p {
-            margin: 0;
-            color: #333;
-            line-height: 1.6;
+        table {
+            width: 100%;
+            border-collapse: collapse;
         }
 
-        .note-meta { color:#777; font-size:12px; }
-        .read-btn { background:#5f61d6; color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:600; }
-
-        .notification-header {
-            margin-bottom: 20px;
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
         }
 
-        .notification-header h2 {
-            color:#5f61d6;
-        }
-
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
+        th {
+            background: #e8f5e9;
             color: #5f61d6;
+        }
+
+        .status-submitted {
+            color: #ef6c00;
             font-weight: bold;
-            text-decoration: none;
+        }
+
+        .review-btn {
+            background: #5f61d6;
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .review-btn:hover {
+            background: #5f61d6;
+        }
+
+        form {
+            margin: 0;
         }
     </style>
 </head>
 <body class="dashboard-page">
-
-   <div class="topbar">
+    <div class="topbar">
         <div class="topbar-left">
             <div class="site-name">ScholarMates</div>
 
             <div class="topbar-nav">
                 <a href="{{ url_for('admin_dashboard') }}">Home</a>
                 <a href="{{ url_for('admin_scholarships') }}">Scholarships</a>
-                <a href="{{ url_for('view_applications') }}">Submissions</a>
+                <a href="{{ url_for('view_applications') }}"class="active">Submissions</a>
                 <a href="{{ url_for('manage_applications') }}">Review</a>
-                <a href="{{ url_for('admin_notifications') }}"class="active">Notifications</a>
+                <a href="{{ url_for('admin_notifications') }}">Notifications</a>
             </div>
         </div>
 
@@ -137,30 +145,40 @@
         </div>
     </div>
 
-    <div class="notification-page">
-        <a class="back-link" href="{{ url_for('admin_dashboard') }}">← Back</a>
+    <div class="page">
+        <div class="card">
+            <h2>New Submitted Applications</h2>
 
-        <div class="notification-header">
-            <h2>Admin Notifications</h2>
-        </div>
+            {% if applications %}
+            <table>
+                <tr>
+                    <th>Application ID</th>
+                    <th>Student Name</th>
+                    <th>Student Number</th>
+                    <th>Scholarship</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
 
-        {% if notifications %}
-                {% for notification in notifications %}
-                <div class="notification-card">
-                    <div>
-                        <p>{{ notification.message }}</p>
-                    </div>
-                    <form method="POST" action="{{ url_for('mark_admin_notification_read', notif_id=notification.id) }}">
-                        <button type="submit" class="read-btn">Mark as read</button>
-                    </form>
-                </div>
+                {% for app in applications %}
+                <tr>
+                    <td>{{ app.id }}</td>
+                    <td>{{ app.student.user.full_name }}</td>
+                    <td>{{ app.student.student_number }}</td>
+                    <td>{{ app.scholarship.title }}</td>
+                    <td><span class="status-submitted">{{ app.status }}</span></td>
+                    <td>
+                        <form method="POST" action="{{ url_for('mark_under_review', app_id=app.id) }}">
+                            <button type="submit" class="review-btn">Move to Under Review</button>
+                        </form>
+                    </td>
+                </tr>
                 {% endfor %}
-        {% else %}
-            <div class="notification-card">
-                <p>No notifications found.</p>
-            </div>
-        {% endif %}
+            </table>
+            {% else %}
+                <p>No new submitted applications.</p>
+            {% endif %}
+        </div>
     </div>
-
 </body>
 </html>

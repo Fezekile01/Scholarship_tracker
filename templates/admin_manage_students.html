@@ -6,13 +6,76 @@
     <title>Manage Students</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            background:#132a13;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .site-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .topbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            flex-wrap: wrap;
+        }
+
+        .topbar-nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .topbar-nav a.active {
+            color: #90a955;
+            font-weight: bold;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #00b4d8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
+        .profile-avatar svg {
+            width: 26px;
+            height: 26px;
+        }
+    
         .page { padding: 30px; }
         .card { background: #fff; padding: 20px; border-radius: 14px; box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
         table { width:100%; border-collapse: collapse; }
         th, td { padding:12px; border:1px solid #ddd; text-align:left; }
-        th { background:#e8f5e9; color:#1b5e20; }
-        .status-ok { color:#1b5e20; font-weight:bold; }
+        th { background:#e8f5e9; color:#5f61d6; }
+        .status-ok { color:#5f61d6; font-weight:bold; }
         .status-missing { color:#c62828; font-weight:bold; }
+        .table-wrap { overflow-x:auto; }
     </style>
 </head>
 <body class="dashboard-page">
@@ -25,6 +88,7 @@
         <div class="card">
             <h2>Registered Students</h2>
             {% if students %}
+            <div class="table-wrap" role="region" aria-label="Students table">
             <table>
                 <tr>
                     <th>Name</th>
@@ -33,6 +97,7 @@
                     <th>Course</th>
                     <th>Year</th>
                     <th>Profile Docs</th>
+                    <th>Account</th>
                 </tr>
                 {% for s in students %}
                 {% set doc = profile_docs.get(s.id) %}
@@ -49,9 +114,20 @@
                             <span class="status-missing">Missing</span>
                         {% endif %}
                     </td>
+                    <td>
+                        {% if s.user.is_locked %}
+                            <span class="status-missing">Locked</span>
+                            <form method="POST" action="{{ url_for('unlock_student', user_id=s.user.id) }}" style="margin-top:6px;">
+                                <button type="submit" class="login-btn" aria-label="Unlock {{ s.user.full_name }}" style="padding:6px 10px;">Unlock</button>
+                            </form>
+                        {% else %}
+                            <span class="status-ok">Active</span>
+                        {% endif %}
+                    </td>
                 </tr>
                 {% endfor %}
             </table>
+            </div>
             {% else %}
                 <p>No students registered.</p>
             {% endif %}

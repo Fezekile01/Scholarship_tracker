@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Application</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        body.dashboard-page {
+            background: #edf5ee;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            background:#132a13;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .site-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .topbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            flex-wrap: wrap;
+        }
+
+        .topbar-nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .topbar-nav a.active {
+            color: #90a955;
+            font-weight: bold;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #90a955;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
+        .profile-avatar svg {
+            width: 26px;
+            height: 26px;
+        }
+    
+
+        .review-page {
+            flex: 1;
+            padding: 20px 30px 30px 30px;
+            overflow: hidden;
+        }
+
+        .review-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+            align-items: stretch;
+            height: 100%;
+        }
+
+        .main-card,
+        .side-card {
+            background: white;
+            border-radius: 18px;
+            padding: 25px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+            overflow-y: auto;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .main-card h2,
+        .side-card h2,
+        .main-card h3,
+        .side-card h3 {
+            color:#5f61d6;
+            margin-bottom: 12px;
+        }
+
+        .section {
+            margin-bottom: 28px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .field {
+            margin-bottom: 12px;
+        }
+
+        .field strong {
+            color: #5f61d6;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .field p {
+            margin: 0;
+            color: #333;
+            line-height: 1.6;
+            word-break: break-word;
+        }
+
+        .status-box {
+            background: #f9fff9;
+            border: 1px solid #dfe9df;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .status-box select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+
+        .update-btn {
+            background:#5f61d6;
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+        }
+
+        .doc-list {
+            padding-left: 18px;
+        }
+
+        .doc-list li {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .view-btn {
+            background: #0d47a1;
+            color: #fff;
+            padding: 6px 10px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            transition: background 0.15s ease;
+        }
+
+        .view-btn:hover { background: #1565c0; }
+
+        .doc-label { flex: 1; color:#5f61d6; font-weight: 600; }
+        .doc-meta { color: #777; font-size: 13px; white-space: nowrap; }
+        
+
+        @media (max-width: 900px) {
+            html, body {
+                overflow: auto;
+            }
+
+            .review-page {
+                overflow: visible;
+            }
+
+            .review-layout {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+
+            .main-card,
+            .side-card {
+                height: auto;
+                max-height: none;
+                overflow: visible;
+            }
+        }
+    </style>
+</head>
+<body class="dashboard-page">
+    <div class="topbar">
+        <div class="topbar-left">
+            <div class="site-name">ScholarMates</div>
+
+            <div class="topbar-nav">
+                <a href="{{ url_for('admin_dashboard') }}">Home</a>
+                <a href="{{ url_for('admin_scholarships') }}">Scholarships</a>
+                <a href="{{ url_for('view_applications') }}">Submissions</a>
+                <a href="{{ url_for('manage_applications') }}" class="active">Review</a>
+                <a href="{{ url_for('admin_notifications') }}">Notifications</a>
+            </div>
+        </div>
+
+        <div class="topbar-right">
+            <a class="profile-avatar" href="{{ url_for('student_profile') }}" aria-label="Student Profile">
+                <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="32" cy="22" r="14" fill="#ffd54f" />
+                    <path d="M12 56c0-11 9-20 20-20s20 9 20 20" fill="#ffd54f" />
+                </svg>
+            </a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </div>
+
+    <div class="review-page">
+        <div class="review-layout">
+
+            <div class="main-card">
+                <h2>Student Submitted Application</h2>
+
+                {% if form %}
+                    <div class="section">
+                        <h3>Part 1: Personal Information</h3>
+                        <div class="field"><strong>Full Name</strong><p>{{ form.full_name }}</p></div>
+                        <div class="field"><strong>Date of Birth</strong><p>{{ form.date_of_birth or '-' }}</p></div>
+                        <div class="field"><strong>Nationality</strong><p>{{ form.nationality or '-' }}</p></div>
+                        <div class="field"><strong>Country of Residence</strong><p>{{ form.country_of_residence or '-' }}</p></div>
+                        <div class="field"><strong>Email</strong><p>{{ form.email or '-' }}</p></div>
+                        <div class="field"><strong>Phone Number</strong><p>{{ form.phone_number or '-' }}</p></div>
+                        <div class="field"><strong>Mailing Address</strong><p>{{ form.mailing_address or '-' }}</p></div>
+                        <div class="field"><strong>LinkedIn</strong><p>{{ form.linkedin_url or '-' }}</p></div>
+                        <div class="field"><strong>Portfolio</strong><p>{{ form.portfolio_url or '-' }}</p></div>
+                        <div class="field"><strong>PhD Student</strong><p>{{ 'Yes' if form.is_phd_student else 'No' }}</p></div>
+                        <div class="field"><strong>ORCID iD</strong><p>{{ form.orcid_id or '-' }}</p></div>
+                    </div>
+
+                    <div class="section">
+                        <h3>Part 2: Academic Background</h3>
+                        <div class="field"><strong>Current / Highest Degree</strong><p>{{ form.current_highest_degree or '-' }}</p></div>
+                        <div class="field"><strong>Degree Title</strong><p>{{ form.current_degree_title or '-' }}</p></div>
+                        <div class="field"><strong>Institution</strong><p>{{ form.current_institution_name or '-' }}</p></div>
+                        <div class="field"><strong>Location</strong><p>{{ form.current_location or '-' }}</p></div>
+                        <div class="field"><strong>Dates Attended</strong><p>{{ form.current_dates_attended or '-' }}</p></div>
+                        <div class="field"><strong>GPA / Grade</strong><p>{{ form.current_gpa_grade or '-' }}</p></div>
+                        <div class="field"><strong>Thesis / Dissertation Title</strong><p>{{ form.thesis_dissertation_title or '-' }}</p></div>
+                        <div class="field"><strong>Supervisor Name</strong><p>{{ form.supervisor_name or '-' }}</p></div>
+                        <div class="field"><strong>Previous Degree</strong><p>{{ form.previous_degree or '-' }}</p></div>
+                        <div class="field"><strong>Previous Degree Title</strong><p>{{ form.previous_degree_title or '-' }}</p></div>
+                        <div class="field"><strong>Previous Institution</strong><p>{{ form.previous_institution_name or '-' }}</p></div>
+                        <div class="field"><strong>Previous Location</strong><p>{{ form.previous_location or '-' }}</p></div>
+                        <div class="field"><strong>Previous Dates Attended</strong><p>{{ form.previous_dates_attended or '-' }}</p></div>
+                    </div>
+
+                    <div class="section">
+                        <h3>Part 3: Proposed Course of Study</h3>
+                        <div class="field"><strong>Program Applying For</strong><p>{{ form.program_applying_for or '-' }}</p></div>
+                        <div class="field"><strong>Level of Study</strong><p>{{ form.proposed_level_of_study or '-' }}</p></div>
+                        <div class="field"><strong>Program Title</strong><p>{{ form.proposed_program_title or '-' }}</p></div>
+                        <div class="field"><strong>Proposed Universities</strong><p>{{ form.proposed_universities or '-' }}</p></div>
+                        <div class="field"><strong>Proposed Start Date</strong><p>{{ form.proposed_start_date or '-' }}</p></div>
+                        <div class="field"><strong>Anticipated Completion Date</strong><p>{{ form.anticipated_completion_date or '-' }}</p></div>
+                        <div class="field"><strong>Proposed Thesis Title</strong><p>{{ form.proposed_thesis_title or '-' }}</p></div>
+                        <div class="field"><strong>Research Question / Aim</strong><p>{{ form.research_question_aim or '-' }}</p></div>
+                        <div class="field"><strong>Methodology</strong><p>{{ form.proposed_methodology or '-' }}</p></div>
+                        <div class="field"><strong>Significance / Expected Outcomes</strong><p>{{ form.significance_expected_outcomes or '-' }}</p></div>
+                        <div class="field"><strong>Potential Supervisors</strong><p>{{ form.potential_supervisors or '-' }}</p></div>
+                        <div class="field"><strong>Motivation</strong><p>{{ form.motivation or '-' }}</p></div>
+                        <div class="field"><strong>Career Goals</strong><p>{{ form.career_goals or '-' }}</p></div>
+                        <div class="field"><strong>Why This Program / University?</strong><p>{{ form.why_this_program_university or '-' }}</p></div>
+                        <div class="field"><strong>Why You?</strong><p>{{ form.why_you or '-' }}</p></div>
+                        <div class="field"><strong>Relevant Experiences</strong><p>{{ form.relevant_experiences or '-' }}</p></div>
+                    </div>
+
+                    <div class="section">
+                        <h3>Part 4: Supporting Information</h3>
+                        <div class="field"><strong>Work Experience</strong><p>{{ form.work_experience or '-' }}</p></div>
+                        <div class="field"><strong>Research Experience</strong><p>{{ form.research_experience or '-' }}</p></div>
+                        <div class="field"><strong>Publications / Presentations</strong><p>{{ form.publications_presentations or '-' }}</p></div>
+                        <div class="field"><strong>Volunteering & Extracurricular</strong><p>{{ form.volunteering_extracurricular or '-' }}</p></div>
+                        <div class="field"><strong>Awards / Prizes</strong><p>{{ form.awards_prizes or '-' }}</p></div>
+                        <div class="field"><strong>Skills / Languages</strong><p>{{ form.skills_languages or '-' }}</p></div>
+                    </div>
+
+                    <div class="section">
+                        <h3>Part 5: Referees</h3>
+                        <div class="field"><strong>Referee 1</strong><p>{{ form.ref1_name_title or '-' }}</p></div>
+                        <div class="field"><strong>Referee 1 Institution</strong><p>{{ form.ref1_institution or '-' }}</p></div>
+                        <div class="field"><strong>Referee 1 Department</strong><p>{{ form.ref1_department or '-' }}</p></div>
+                        <div class="field"><strong>Referee 1 Email</strong><p>{{ form.ref1_email or '-' }}</p></div>
+                        <div class="field"><strong>Referee 1 Phone</strong><p>{{ form.ref1_phone or '-' }}</p></div>
+                        <div class="field"><strong>Referee 1 Relationship</strong><p>{{ form.ref1_relationship or '-' }}</p></div>
+                        <div class="field"><strong>Referee 1 Known Duration</strong><p>{{ form.ref1_known_duration or '-' }}</p></div>
+
+                        <div class="field"><strong>Referee 2</strong><p>{{ form.ref2_name_title or '-' }}</p></div>
+                        <div class="field"><strong>Referee 2 Institution</strong><p>{{ form.ref2_institution or '-' }}</p></div>
+                        <div class="field"><strong>Referee 2 Department</strong><p>{{ form.ref2_department or '-' }}</p></div>
+                        <div class="field"><strong>Referee 2 Email</strong><p>{{ form.ref2_email or '-' }}</p></div>
+                        <div class="field"><strong>Referee 2 Phone</strong><p>{{ form.ref2_phone or '-' }}</p></div>
+                        <div class="field"><strong>Referee 2 Relationship</strong><p>{{ form.ref2_relationship or '-' }}</p></div>
+                        <div class="field"><strong>Referee 2 Known Duration</strong><p>{{ form.ref2_known_duration or '-' }}</p></div>
+
+                        <div class="field"><strong>Referee 3</strong><p>{{ form.ref3_name_title or '-' }}</p></div>
+                        <div class="field"><strong>Referee 3 Institution</strong><p>{{ form.ref3_institution or '-' }}</p></div>
+                        <div class="field"><strong>Referee 3 Department</strong><p>{{ form.ref3_department or '-' }}</p></div>
+                        <div class="field"><strong>Referee 3 Email</strong><p>{{ form.ref3_email or '-' }}</p></div>
+                        <div class="field"><strong>Referee 3 Phone</strong><p>{{ form.ref3_phone or '-' }}</p></div>
+                        <div class="field"><strong>Referee 3 Relationship</strong><p>{{ form.ref3_relationship or '-' }}</p></div>
+                        <div class="field"><strong>Referee 3 Known Duration</strong><p>{{ form.ref3_known_duration or '-' }}</p></div>
+                    </div>
+
+                    <div class="section">
+                        <h3>Part 6: Attached Profile Documents</h3>
+                        {% if profile_docs %}
+                            <ul class="doc-list">
+                                {% for doc in profile_docs %}
+                                    <li>
+                                        <span class="doc-label">{{ required_profile_docs.get(doc.doc_type, doc.doc_type.replace('_', ' ').title()) }}</span>
+                                        <span class="doc-meta">{{ doc.filename }}</span>
+                                        <a class="view-btn" href="{{ url_for('static', filename='uploads/' + doc.filename) }}" target="_blank">View</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>No attached profile documents.</p>
+                        {% endif %}
+
+                        {% if documents %}
+                            <h4>Additional Uploaded Files</h4>
+                            <ul class="doc-list">
+                                {% for doc in documents %}
+                                    <li>
+                                        <span class="doc-label">{{ doc.filename }}</span>
+                                        <span class="doc-meta">Uploaded {{ doc.uploaded_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                                        <a class="view-btn" href="{{ url_for('static', filename='uploads/' + doc.filename) }}" target="_blank">View</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+
+                        {% if form.attachments_summary %}
+                            <p style="color:#777;">Summary: {{ form.attachments_summary }}</p>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <p>No application form data found.</p>
+                {% endif %}
+            </div>
+
+            <div class="side-card">
+                <h2>Scholarship Review Guide</h2>
+
+                <div class="field">
+                    <strong>Scholarship Title</strong>
+                    <p>{{ scholarship.title }}</p>
+                </div>
+
+                <div class="field">
+                    <strong>Description</strong>
+                    <p>{{ scholarship.description }}</p>
+                </div>
+
+                <div class="field">
+                    <strong>Requirements</strong>
+                    <p>{{ scholarship.requirements }}</p>
+                </div>
+
+                <div class="field">
+                    <strong>Deadline</strong>
+                    <p>{{ scholarship.deadline }}</p>
+                </div>
+
+                <div class="field">
+                    <strong>Current Application Status</strong>
+                    <p>{{ application.status }}</p>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <h3>Update Application Status</h3>
+
+                    <form method="POST" action="{{ url_for('update_application_status', app_id=application.id) }}">
+
+                        <label>Status</label>
+                        <select name="status" id="statusSelect" onchange="toggleReasonBox()">
+                            <option value="Under Review">Under Review</option>
+                            <option value="Shortlisted">Shortlisted</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Rejected">Rejected</option>
+                            <option value="Incomplete">Incomplete</option>
+                        </select>
+
+                        <div id="reasonBox" style="display:none; margin-top:10px;">
+                            <label>Reason</label>
+                            <textarea name="reason" rows="3" placeholder="Provide a reason..."></textarea>
+                        </div>
+
+                        <button type="submit" style="margin-top:10px;">Update Status</button>
+                    </form>
+                </div>
+
+                <script>
+                function toggleReasonBox() {
+                    const status = document.getElementById('statusSelect').value;
+                    const box = document.getElementById('reasonBox');
+
+                    if (status === 'Rejected' || status === 'Incomplete') {
+                        box.style.display = 'block';
+                    } else {
+                        box.style.display = 'none';
+                    }
+                }
+                </script>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

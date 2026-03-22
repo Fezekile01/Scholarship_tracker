@@ -9,12 +9,26 @@
         .upload-wrapper { padding: 30px; }
         form { margin-bottom: 20px; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         input[type=file] { margin-bottom: 10px; }
-        button { background: #1b5e20; color: white; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; }
+        button { background: #5f61d6; color: white; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; }
         .notice { margin-bottom: 14px; font-weight: bold; }
         .error { color: #c62828; }
         .doc-list { background: white; padding: 16px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .doc-item { padding: 10px 0; border-bottom: 1px solid #eee; }
+        .doc-item { padding: 10px 0; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 12px; justify-content: space-between; }
         .doc-item:last-child { border-bottom: none; }
+        .view-btn {
+            background: #0d47a1;
+            color: #fff;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background 0.15s ease;
+        }
+        .view-btn:hover { background: #1565c0; }
+        .doc-name { flex: 1; color: #5f61d6; font-weight: 600; }
+        .doc-meta { color: #777; font-size: 13px; white-space: nowrap; }
     </style>
 </head>
 <body class="dashboard-page">
@@ -39,8 +53,9 @@
             {% if documents %}
                 {% for doc in documents %}
                     <div class="doc-item">
-                        <a href="{{ url_for('static', filename='uploads/' + doc.filename) }}" target="_blank">{{ doc.filename }}</a>
-                        <span style="color:#777; font-size: 14px;">Uploaded {{ doc.uploaded_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                        <span class="doc-name">{{ doc.filename }}</span>
+                        <span class="doc-meta">Uploaded {{ doc.uploaded_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                        <a class="view-btn" href="{{ url_for('static', filename='uploads/' + doc.filename) }}" target="_blank">View</a>
                     </div>
                 {% endfor %}
             {% else %}

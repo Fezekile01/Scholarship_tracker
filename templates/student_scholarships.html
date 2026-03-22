@@ -6,59 +6,832 @@
     <title>Available Scholarships</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
-        .table-wrapper { padding: 30px; }
-        .notice { margin-bottom: 16px; color: #1b5e20; font-weight: bold; }
-        .error { color: #c62828; }
-        table { width: 100%; border-collapse: collapse; background: white; }
-        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
-        th { background: #e8f5e9; color: #1b5e20; }
-        .apply-btn { padding: 8px 12px; background: #1b5e20; color: white; border: none; border-radius: 6px; cursor: pointer; }
-        .apply-btn:disabled { background: #9e9e9e; cursor: not-allowed; }
-        .topbar a { color: #ffd54f; text-decoration: none; font-weight: bold; }
+        .page-wrap {
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            margin-bottom: 18px;
+        }
+
+        .page-title h2 {
+            color: #023e8a;
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .page-title p {
+            color: #666;
+            font-size: 15px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .site-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .topbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            flex-wrap: wrap;
+        }
+
+        .topbar-nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .topbar-nav a.active {
+            color: #ffd54f;
+            font-weight: bold;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #00b4d8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
+        .profile-avatar svg {
+            width: 26px;
+            height: 26px;
+        }
+
+        .filter-bar {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 25px;
+        }
+
+        .filter-bar input,
+        .filter-bar select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #d2d2d2;
+            border-radius: 10px;
+            font-size: 15px;
+            outline: none;
+            background: white;
+        }
+
+        .filter-bar input:focus,
+        .filter-bar select:focus {
+            border-color: #fbc02d;
+            box-shadow: 0 0 6px rgba(251, 192, 45, 0.35);
+        }
+
+        .scholarship-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+
+        .preview-card {
+            cursor: pointer;
+            background: #fff;
+            padding: 24px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.2s;
+        }
+
+        .preview-card:hover {
+            background-color: #bfdbf7;
+        }
+
+        .preview-card:last-child {
+            border-bottom: none;
+        }
+
+        .apply-btn {
+            background: #00509d;
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .apply-btn:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+
+        .message-box {
+            background: #e8f5e9;
+            color: #1b5e20;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state {
+            background: white;
+            padding: 20px;
+            border-radius: 14px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+            color: #555;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.55);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 30px auto;
+            padding: 25px;
+            width: 90%;
+            max-width: 1000px;
+            border-radius: 18px;
+        }
+
+        .close-btn {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .form-section {
+            margin-top: 25px;
+            padding: 20px;
+            background: #e3f2fd;
+            border: 1px solid #dfe9df;
+            border-radius: 14px;
+        }
+
+        .form-section h3 {
+            color: #001f54;
+            margin-bottom: 15px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            color: #133c55;
+            margin-bottom: 6px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .doc-list {
+            margin-top: 10px;
+            padding-left: 18px;
+        }
+
+        .submit-btn {
+            margin-top: 20px;
+            background: linear-gradient(90deg, #023e8a, #48cae4);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 18px;
+            align-items: center;
+        }
+
+        @media (max-width: 900px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                width: 95%;
+            }
+
+            .filter-bar {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar-left,
+            .topbar-nav,
+            .topbar-right {
+                width: 100%;
+            }
+        }
     </style>
+
+    <script>
+        function openDetailsModal(card) {
+            const id = card.dataset.id;
+            const title = card.dataset.title;
+            const desc = card.dataset.desc;
+            const req = card.dataset.req;
+            const deadline = card.dataset.deadline;
+            const applied = card.dataset.applied;
+
+            document.getElementById('detailsModal').style.display = 'block';
+
+            document.getElementById('scholarshipTitleDisplay').innerText = title;
+            document.getElementById('modalDescription').innerHTML = desc;
+            document.getElementById('modalRequirements').innerHTML = req;
+            document.getElementById('modalDeadline').innerText = deadline;
+
+            const applyBtn = document.getElementById('modalApplyBtn');
+
+            if (applied === 'yes') {
+                applyBtn.disabled = true;
+                applyBtn.innerText = 'Already Applied';
+                applyBtn.onclick = null;
+            } else {
+                applyBtn.disabled = false;
+                applyBtn.innerText = 'Apply';
+                applyBtn.onclick = function() {
+                    openFormModal(id, title);
+                };
+            }
+        }
+
+        function closeDetailsModal() {
+            document.getElementById('detailsModal').style.display = 'none';
+        }
+
+        function openFormModal(scholarshipId, scholarshipTitle) {
+            closeDetailsModal();
+            document.getElementById('applicationModal').style.display = 'block';
+            document.getElementById('applicationForm').action = '/apply/' + scholarshipId;
+            document.getElementById('applicationScholarshipTitle').innerText = scholarshipTitle;
+        }
+
+        function closeFormModal() {
+            document.getElementById('applicationModal').style.display = 'none';
+        }
+
+        function toggleOrcid() {
+            const phdYes = document.getElementById('phd_yes');
+            const orcidWrapper = document.getElementById('orcid-wrapper');
+            orcidWrapper.style.display = phdYes.checked ? 'block' : 'none';
+        }
+
+        function filterAndSortScholarships() {
+            const searchValue = document.getElementById('searchInput').value.toLowerCase().trim();
+            const sortValue = document.getElementById('sortDeadline').value;
+            const levelValue = document.getElementById('filterLevel').value.toLowerCase();
+
+            const grid = document.getElementById('scholarshipGrid');
+            const cards = Array.from(grid.querySelectorAll('.preview-card'));
+
+            cards.forEach(card => {
+                const title = (card.dataset.title || '').toLowerCase();
+                const desc = (card.dataset.desc || '').toLowerCase();
+                const req = (card.dataset.req || '').toLowerCase();
+                const level = (card.dataset.level || '').toLowerCase();
+
+                const matchesSearch =
+                    title.includes(searchValue) ||
+                    desc.includes(searchValue) ||
+                    req.includes(searchValue);
+
+                const matchesLevel =
+                    !levelValue || level === levelValue;
+
+                card.style.display = (matchesSearch && matchesLevel) ? 'flex' : 'none';
+            });
+
+            const visibleCards = cards.filter(card => card.style.display !== 'none');
+
+            visibleCards.sort((a, b) => {
+                const dateA = new Date(a.dataset.deadline);
+                const dateB = new Date(b.dataset.deadline);
+
+                if (sortValue === 'deadline_desc') {
+                    return dateB - dateA;
+                }
+                return dateA - dateB;
+            });
+
+            visibleCards.forEach(card => grid.appendChild(card));
+        }
+
+        window.onclick = function(event) {
+            const detailsModal = document.getElementById('detailsModal');
+            const applicationModal = document.getElementById('applicationModal');
+
+            if (event.target === detailsModal) {
+                detailsModal.style.display = 'none';
+            }
+
+            if (event.target === applicationModal) {
+                applicationModal.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('searchInput');
+            const sortDeadline = document.getElementById('sortDeadline');
+            const filterLevel = document.getElementById('filterLevel');
+
+            if (searchInput) searchInput.addEventListener('input', filterAndSortScholarships);
+            if (sortDeadline) sortDeadline.addEventListener('change', filterAndSortScholarships);
+            if (filterLevel) filterLevel.addEventListener('change', filterAndSortScholarships);
+        });
+    </script>
 </head>
 <body class="dashboard-page">
+
     <div class="topbar">
-        <h1>Available Scholarships</h1>
-        <a href="{{ url_for('student_dashboard') }}">Back to Dashboard</a>
+        <div class="topbar-left">
+            <div class="site-name">ScholarMates</div>
+
+            <div class="topbar-nav">
+                <a href="{{ url_for('student_dashboard') }}">Home</a>
+                <a href="{{ url_for('track_applications') }}">Track</a>
+                <a href="{{ url_for('student_scholarships') }}" class="active">Scholarships</a>
+                <a href="{{ url_for('student_notifications') }}">Notifications</a>
+            </div>
+        </div>
+
+        <div class="topbar-right">
+            <a class="profile-avatar" href="{{ url_for('student_profile') }}" aria-label="Student Profile">
+                <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="32" cy="22" r="14" fill="#ffd54f" />
+                    <path d="M12 56c0-11 9-20 20-20s20 9 20 20" fill="#ffd54f" />
+                </svg>
+            </a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
     </div>
 
-    <div class="table-wrapper">
+    <div class="page-wrap">
+
+        <div class="page-title">
+            <h2>Available Scholarships</h2>
+            <p>Browse scholarships matched to your profile and apply online.</p>
+        </div>
+
         {% if message %}
-            <div class="notice">{{ message }}</div>
+            <div class="message-box">{{ message }}</div>
         {% endif %}
+
+        <div class="filter-bar">
+            <input type="text" id="searchInput" placeholder="Search scholarships by title, description, or requirement">
+
+            <select id="sortDeadline">
+                <option value="deadline_asc">Sort by deadline: earliest first</option>
+                <option value="deadline_desc">Sort by deadline: latest first</option>
+            </select>
+
+            <select id="filterLevel">
+                <option value="">Filter by level of study</option>
+                <option value="undergraduate">Undergraduate</option>
+                <option value="postgraduate">Postgraduate</option>
+                <option value="honors">Honors</option>
+                <option value="masters">Masters</option>
+                <option value="phd">PhD</option>
+            </select>
+        </div>
 
         {% if scholarships %}
-            <table>
-                <tr>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Requirements</th>
-                    <th>Deadline</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
+            <div class="scholarship-grid" id="scholarshipGrid">
                 {% for scholarship in scholarships %}
-                {% set already_applied = scholarship.id in existing_applications %}
-                <tr>
-                    <td>{{ scholarship.title }}</td>
-                    <td>{{ scholarship.description }}</td>
-                    <td>{{ scholarship.requirements }}</td>
-                    <td>{{ scholarship.deadline }}</td>
-                    <td>{{ scholarship.status }}</td>
-                    <td>
-                        <form method="post" action="{{ url_for('apply_scholarship', scholarship_id=scholarship.id) }}">
-                            <button class="apply-btn" type="submit" {% if already_applied %}disabled{% endif %}>
-                                {{ 'Applied' if already_applied else 'Apply' }}
-                            </button>
-                        </form>
-                    </td>
-                </tr>
+                    <div class="preview-card"
+                         data-id="{{ scholarship.id }}"
+                         data-title="{{ scholarship.title }}"
+                         data-desc="{{ scholarship.description }}"
+                         data-req="{{ scholarship.requirements }}"
+                         data-deadline="{{ scholarship.deadline }}"
+                         data-level="{{ scholarship.level_of_study if scholarship.level_of_study else '' }}"
+                         data-applied="{{ 'yes' if scholarship.id in existing_applications else 'no' }}"
+                         onclick="openDetailsModal(this)">
+
+                        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 15px;">
+                            <div>
+                                <span style="font-size: 0.8rem; color: #03045e; font-weight: bold;">
+                                    {{ scholarship.department }}
+                                </span>
+                                <h3 style="margin: 5px 0;">{{ scholarship.title }}</h3>
+                            </div>
+                            <div class="card-meta" style="display: flex; flex-direction: column; gap: 4px;">
+                                <span><strong>Deadline:</strong> {{ scholarship.deadline }}</span>
+                                <span><strong>Applicants:</strong> {{ scholarship.applications|length }}</span>
+                            </div>
+                        </div>
+
+                        <p style="color: #666; margin: 10px 0 0 0;">
+                            {{ scholarship.description|striptags|truncate(150) }}
+                        </p>
+                    </div>
                 {% endfor %}
-            </table>
+            </div>
         {% else %}
-            <p>No scholarships are currently available.</p>
+            <div class="empty-state">No scholarships are currently available.</div>
         {% endif %}
     </div>
+
+    <!-- MODAL 1: Scholarship Details -->
+    <div id="detailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeDetailsModal()">&times;</span>
+
+            <h2 id="scholarshipTitleDisplay" style="color:#1b5e20;"></h2>
+            <hr>
+
+            <h4>Description</h4>
+            <div id="modalDescription" style="margin-bottom: 20px;"></div>
+
+            <h4>Requirements</h4>
+            <div id="modalRequirements" style="margin-bottom: 20px;"></div>
+
+            <p><strong>Deadline:</strong> <span id="modalDeadline"></span></p>
+
+            <div style="margin-top: 30px; text-align: right;">
+                <button type="button" class="apply-btn" id="modalApplyBtn">Apply</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: Full Application Form -->
+    <div id="applicationModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeFormModal()">&times;</span>
+
+            <h2>Scholarship Application Form</h2>
+            <p><strong>Scholarship:</strong> <span id="applicationScholarshipTitle"></span></p>
+
+            <form id="applicationForm" method="POST">
+
+                <div class="form-section">
+                    <h3>Part 1: Personal Information</h3>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" name="full_name" value="{{ user.full_name }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Date of Birth</label>
+                            <input type="date" name="date_of_birth">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Nationality / Citizenship</label>
+                            <input type="text" name="nationality">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Country of Residence</label>
+                            <input type="text" name="country_of_residence">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" name="email" value="{{ user.email }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="text" name="phone_number" value="{{ user.phone_number }}">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Mailing Address</label>
+                            <textarea name="mailing_address" rows="3"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>LinkedIn Profile URL</label>
+                            <input type="url" name="linkedin_url">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Personal Website / Portfolio URL</label>
+                            <input type="url" name="portfolio_url">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Are you a PhD student?</label>
+                            <div class="radio-group">
+                                <label><input type="radio" id="phd_yes" name="is_phd_student" value="yes" onclick="toggleOrcid()"> Yes</label>
+                                <label><input type="radio" name="is_phd_student" value="no" onclick="toggleOrcid()" checked> No</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group full-width" id="orcid-wrapper" style="display:none;">
+                            <label>ORCID iD</label>
+                            <input type="text" name="orcid_id">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Part 2: Academic Background</h3>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Current / Highest Degree</label>
+                            <input type="text" name="current_highest_degree" value="{{ student.level_of_study }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Degree Title</label>
+                            <input type="text" name="current_degree_title">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Institution Name</label>
+                            <input type="text" name="current_institution_name">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Location</label>
+                            <input type="text" name="current_location">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Dates Attended</label>
+                            <input type="text" name="current_dates_attended" placeholder="Start Month/Year – End Month/Year or Expected Graduation Date">
+                        </div>
+
+                        <div class="form-group">
+                            <label>GPA / Grade</label>
+                            <input type="text" name="current_gpa_grade">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Thesis / Dissertation Title</label>
+                            <input type="text" name="thesis_dissertation_title">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Supervisor's Name</label>
+                            <input type="text" name="supervisor_name">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Previous Degree</label>
+                            <input type="text" name="previous_degree">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Previous Degree Title</label>
+                            <input type="text" name="previous_degree_title">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Previous Institution Name</label>
+                            <input type="text" name="previous_institution_name">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Previous Location</label>
+                            <input type="text" name="previous_location">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Previous Dates Attended</label>
+                            <input type="text" name="previous_dates_attended">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Part 3: Proposed Course of Study</h3>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Program Applying For</label>
+                            <input type="text" name="program_applying_for">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Level of Study</label>
+                            <input type="text" name="proposed_level_of_study" value="{{ student.level_of_study }}">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Proposed Course / Program Title</label>
+                            <input type="text" name="proposed_program_title">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Proposed University / Institution(s)</label>
+                            <textarea name="proposed_universities" rows="2"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Proposed Start Date</label>
+                            <input type="date" name="proposed_start_date">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Anticipated Completion Date</label>
+                            <input type="date" name="anticipated_completion_date">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Proposed Thesis Title</label>
+                            <input type="text" name="proposed_thesis_title">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Research Question / Aim</label>
+                            <textarea name="research_question_aim" rows="3"></textarea>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Proposed Methodology</label>
+                            <textarea name="proposed_methodology" rows="3"></textarea>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Significance / Expected Outcomes</label>
+                            <textarea name="significance_expected_outcomes" rows="3"></textarea>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Potential Supervisor(s)</label>
+                            <textarea name="potential_supervisors" rows="2"></textarea>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Motivation</label>
+                            <textarea name="motivation" rows="3"></textarea>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Career Goals</label>
+                            <textarea name="career_goals" rows="3"></textarea>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Why This Program / University?</label>
+                            <textarea name="why_this_program_university" rows="3"></textarea>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Why You?</label>
+                            <textarea name="why_you" rows="3"></textarea>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Relevant Experiences</label>
+                            <textarea name="relevant_experiences" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Part 4: Supporting Information</h3>
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label>Work Experience</label>
+                            <textarea name="work_experience" rows="4"></textarea>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Research Experience</label>
+                            <textarea name="research_experience" rows="4"></textarea>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Publications / Presentations</label>
+                            <textarea name="publications_presentations" rows="4"></textarea>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Volunteering & Extracurricular Activities</label>
+                            <textarea name="volunteering_extracurricular" rows="4"></textarea>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Awards, Scholarships, and Prizes</label>
+                            <textarea name="awards_prizes" rows="4"></textarea>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Skills / Languages</label>
+                            <textarea name="skills_languages" rows="4"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Part 5: Referees</h3>
+                    <div class="form-grid">
+                        <div class="form-group"><label>Referee 1 - Full Name & Title</label><input type="text" name="ref1_name_title"></div>
+                        <div class="form-group"><label>Institution / Organization</label><input type="text" name="ref1_institution"></div>
+                        <div class="form-group"><label>Department</label><input type="text" name="ref1_department"></div>
+                        <div class="form-group"><label>Email</label><input type="email" name="ref1_email"></div>
+                        <div class="form-group"><label>Phone Number</label><input type="text" name="ref1_phone"></div>
+                        <div class="form-group"><label>Relationship</label><input type="text" name="ref1_relationship"></div>
+                        <div class="form-group full-width"><label>How long have they known you?</label><input type="text" name="ref1_known_duration"></div>
+
+                        <div class="form-group"><label>Referee 2 - Full Name & Title</label><input type="text" name="ref2_name_title"></div>
+                        <div class="form-group"><label>Institution / Organization</label><input type="text" name="ref2_institution"></div>
+                        <div class="form-group"><label>Department</label><input type="text" name="ref2_department"></div>
+                        <div class="form-group"><label>Email</label><input type="email" name="ref2_email"></div>
+                        <div class="form-group"><label>Phone Number</label><input type="text" name="ref2_phone"></div>
+                        <div class="form-group"><label>Relationship</label><input type="text" name="ref2_relationship"></div>
+                        <div class="form-group full-width"><label>How long have they known you?</label><input type="text" name="ref2_known_duration"></div>
+
+                        <div class="form-group"><label>Referee 3 - Full Name & Title</label><input type="text" name="ref3_name_title"></div>
+                        <div class="form-group"><label>Institution / Organization</label><input type="text" name="ref3_institution"></div>
+                        <div class="form-group"><label>Department</label><input type="text" name="ref3_department"></div>
+                        <div class="form-group"><label>Email</label><input type="email" name="ref3_email"></div>
+                        <div class="form-group"><label>Phone Number</label><input type="text" name="ref3_phone"></div>
+                        <div class="form-group"><label>Relationship</label><input type="text" name="ref3_relationship"></div>
+                        <div class="form-group full-width"><label>How long have they known you?</label><input type="text" name="ref3_known_duration"></div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Part 6: Supporting Documents from Profile</h3>
+                    {% if docs %}
+                        <ul class="doc-list">
+                            {% for doc in docs %}
+                                <li>
+                                    {{ doc.doc_type }} — {{ doc.filename }}
+                                    {% if doc.is_certified and doc.certified_date %}
+                                        (Certified on {{ doc.certified_date }})
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        <p>These uploaded profile documents will automatically be attached to this application.</p>
+                    {% else %}
+                        <p>No profile documents uploaded yet. Please upload them in your profile first.</p>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="submit-btn">Submit Application</button>
+            </form>
+        </div>
+    </div>
+
 </body>
 </html>

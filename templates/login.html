@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Scholarship Tracker</title>
+    <title>Login | ScholarMates</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body class="login-page">
@@ -13,7 +13,7 @@
     <div class="login-container">
         <div class="login-left">
             <div class="branding">
-                <h1>Scholarship Tracker</h1>
+                <h1>ScholarMates</h1>
                 <p>
                     Access scholarships, apply online, upload supporting documents,
                     and track your application progress in one place.
@@ -43,14 +43,14 @@
 
                     <button type="submit" class="login-btn">Login</button>
                 </form>
-                <label>
-              <input type="checkbox" name="consent" required>
-              I agree to the <a href="/privacy">Privacy Policy</a> and consent to my data being processed.
-              </label>
 
                 <p class="bottom-text">
-                    Don’t have an account?
+                    Don't have an account?
                     <a href="{{ url_for('register') }}">Register here</a>
+                </p>
+
+                <p class="bottom-text">
+                    <a href="{{ url_for('forgot_password') }}">Forgot password?</a>
                 </p>
             </div>
         </div>

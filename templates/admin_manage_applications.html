@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Applications</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            background:#132a13;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .site-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .topbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            flex-wrap: wrap;
+        }
+
+        .topbar-nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .topbar-nav a.active {
+            color: #90a955;
+            font-weight: bold;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #00b4d8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
+        .profile-avatar svg {
+            width: 26px;
+            height: 26px;
+        }
+    
+        .page {
+            padding: 30px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid #ddd;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: transparent;
+            color: #666;
+            border: none;
+            border-bottom: 3px solid transparent;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: #f1f8e9;
+            color:#5f61d6;
+            border-bottom: 3px solid #5f61d6;
+        }
+
+        .tab-btn:hover {
+            background: #f9f9f9;
+        }
+
+        .card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 14px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+            display: none;
+        }
+
+        .card.active {
+            display: block;
+        }
+
+        .card h2 {
+            margin-top: 0;
+            color: #5f61d6;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #e8f5e9;
+            color:#5f61d6;
+        }
+
+        .review-link {
+            color:#5f61d6;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .status-under-review {
+            color: #1565c0;
+            font-weight: bold;
+        }
+
+        .status-shortlisted {
+            color: #6a1b9a;
+            font-weight: bold;
+        }
+
+        .status-approved {
+            color:#5f61d6;
+            font-weight: bold;
+        }
+
+        .status-rejected {
+            color: #c62828;
+            font-weight: bold;
+        }
+
+        .status-incomplete {
+            color: #ef6c00;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="dashboard-page">
+   <div class="topbar">
+        <div class="topbar-left">
+            <div class="site-name">ScholarMates</div>
+
+            <div class="topbar-nav">
+                <a href="{{ url_for('admin_dashboard') }}">Home</a>
+                <a href="{{ url_for('admin_scholarships') }}">Scholarships</a>
+                <a href="{{ url_for('view_applications') }}">Submissions</a>
+                <a href="{{ url_for('manage_applications') }}"class="active">Review</a>
+                <a href="{{ url_for('admin_notifications') }}">Notifications</a>
+            </div>
+        </div>
+
+        <div class="topbar-right">
+            <a class="profile-avatar" href="{{ url_for('student_profile') }}" aria-label="Student Profile">
+                <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="32" cy="22" r="14" fill="#ffd54f" />
+                    <path d="M12 56c0-11 9-20 20-20s20 9 20 20" fill="#ffd54f" />
+                </svg>
+            </a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </div>
+
+    <div class="page">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openTab(event, 'under-review-tab')">Under Review</button>
+            <button class="tab-btn" onclick="openTab(event, 'shortlisted-tab')">Shortlisted</button>
+            <button class="tab-btn" onclick="openTab(event, 'approved-tab')">Approved</button>
+            <button class="tab-btn" onclick="openTab(event, 'rejected-tab')">Rejected</button>
+            <button class="tab-btn" onclick="openTab(event, 'incomplete-tab')">Incomplete</button>
+        </div>
+
+        <div id="under-review-tab" class="card active">
+            <h2>Under Review</h2>
+            {% if under_review_apps %}
+            <table>
+                <tr>
+                    <th>Student Number</th>
+                    <th>Student Name</th>
+                    <th>Scholarship</th>
+                    <th>Deadline</th>
+                    <th>Date Submitted</th>
+                    <th>Status</th>
+                    <th>Application</th>
+                </tr>
+                {% for application in under_review_apps %}
+                <tr>
+                    <td>{{ application.student.student_number }}</td>
+                    <td>{{ application.student.user.full_name }}</td>
+                    <td>{{ application.scholarship.title }}</td>
+                    <td>{{ application.scholarship.deadline }}</td>
+                    <td>{{ application.submitted_at.strftime('%d/%m/%Y %H:%M') if application.submitted_at else '-' }}</td>
+                    <td><span class="status-under-review">{{ application.status }}</span></td>
+                    <td><a class="review-link" href="{{ url_for('review_application', app_id=application.id) }}">Review</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% else %}
+                <p>No applications under review.</p>
+            {% endif %}
+        </div>
+
+        <div id="shortlisted-tab" class="card">
+            <h2>Shortlisted</h2>
+            {% if shortlisted_apps %}
+            <table>
+                <tr>
+                    <th>Student Number</th>
+                    <th>Student Name</th>
+                    <th>Scholarship</th>
+                    <th>Deadline</th>
+                    <th>Date Submitted</th>
+                    <th>Status</th>
+                    <th>Application</th>
+                </tr>
+                {% for application in shortlisted_apps %}
+                <tr>
+                    <td>{{ application.student.student_number }}</td>
+                    <td>{{ application.student.user.full_name }}</td>
+                    <td>{{ application.scholarship.title }}</td>
+                    <td>{{ application.scholarship.deadline }}</td>
+                    <td>{{ application.submitted_at.strftime('%d/%m/%Y %H:%M') if application.submitted_at else '-' }}</td>
+                    <td><span class="status-shortlisted">{{ application.status }}</span></td>
+                    <td><a class="review-link" href="{{ url_for('review_application', app_id=application.id) }}">Review</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% else %}
+                <p>No shortlisted applications.</p>
+            {% endif %}
+        </div>
+
+        <div id="approved-tab" class="card">
+            <h2>Approved</h2>
+            {% if approved_apps %}
+            <table>
+                <tr>
+                    <th>Student Number</th>
+                    <th>Student Name</th>
+                    <th>Scholarship</th>
+                    <th>Deadline</th>
+                    <th>Date Submitted</th>
+                    <th>Status</th>
+                    <th>Application</th>
+                </tr>
+                {% for application in approved_apps %}
+                <tr>
+                    <td>{{ application.student.student_number }}</td>
+                    <td>{{ application.student.user.full_name }}</td>
+                    <td>{{ application.scholarship.title }}</td>
+                    <td>{{ application.scholarship.deadline }}</td>
+                    <td>{{ application.submitted_at.strftime('%d/%m/%Y %H:%M') if application.submitted_at else '-' }}</td>
+                    <td><span class="status-approved">{{ application.status }}</span></td>
+                    <td><a class="review-link" href="{{ url_for('review_application', app_id=application.id) }}">Review</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% else %}
+                <p>No approved applications.</p>
+            {% endif %}
+        </div>
+
+        <div id="rejected-tab" class="card">
+            <h2>Rejected</h2>
+            {% if rejected_apps %}
+            <table>
+                <tr>
+                    <th>Student Number</th>
+                    <th>Student Name</th>
+                    <th>Scholarship</th>
+                    <th>Deadline</th>
+                    <th>Date Submitted</th>
+                    <th>Status</th>
+                    <th>Application</th>
+                </tr>
+                {% for application in rejected_apps %}
+                <tr>
+                    <td>{{ application.student.student_number }}</td>
+                    <td>{{ application.student.user.full_name }}</td>
+                    <td>{{ application.scholarship.title }}</td>
+                    <td>{{ application.scholarship.deadline }}</td>
+                    <td>{{ application.submitted_at.strftime('%d/%m/%Y %H:%M') if application.submitted_at else '-' }}</td>
+                    <td><span class="status-rejected">{{ application.status }}</span></td>
+                    <td><a class="review-link" href="{{ url_for('review_application', app_id=application.id) }}">Review</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% else %}
+                <p>No rejected applications.</p>
+            {% endif %}
+        </div>
+
+        <div id="incomplete-tab" class="card">
+            <h2>Incomplete</h2>
+            {% if incomplete_apps %}
+            <table>
+                <tr>
+                    <th>Student Number</th>
+                    <th>Student Name</th>
+                    <th>Scholarship</th>
+                    <th>Deadline</th>
+                    <th>Date Submitted</th>
+                    <th>Status</th>
+                    <th>Application</th>
+                </tr>
+                {% for application in incomplete_apps %}
+                <tr>
+                    <td>{{ application.student.student_number }}</td>
+                    <td>{{ application.student.user.full_name }}</td>
+                    <td>{{ application.scholarship.title }}</td>
+                    <td>{{ application.scholarship.deadline }}</td>
+                    <td>{{ application.submitted_at.strftime('%d/%m/%Y %H:%M') if application.submitted_at else '-' }}</td>
+                    <td><span class="status-incomplete">{{ application.status }}</span></td>
+                    <td><a class="review-link" href="{{ url_for('review_application', app_id=application.id) }}">Review</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% else %}
+                <p>No incomplete applications.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function openTab(evt, tabId) {
+            var content = document.getElementsByClassName("card");
+            for (var i = 0; i < content.length; i++) {
+                content[i].classList.remove("active");
+            }
+
+            var buttons = document.getElementsByClassName("tab-btn");
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove("active");
+            }
+
+            document.getElementById(tabId).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+    </script>
+</body>
+</html>

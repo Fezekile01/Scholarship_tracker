@@ -22,6 +22,16 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
         }
 
+        .form-header-card h2 {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+
+        .form-header-card p {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
         .scholarship-form-card {
             background: white;
             padding: 35px;
@@ -56,13 +66,34 @@
             font-size: 15px;
             outline: none;
             background: #fcfcfc;
+            transition: 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: #fbc02d;
+            box-shadow: 0 0 8px rgba(251, 192, 45, 0.3);
+            background: white;
+        }
+
+        .form-group textarea {
+            resize: vertical;
         }
 
         .form-actions {
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
+            align-items: center;
             gap: 15px;
             margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .right-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
         }
 
         .cancel-btn {
@@ -75,6 +106,10 @@
             font-weight: bold;
         }
 
+        .cancel-btn:hover {
+            background: #dddddd;
+        }
+
         .save-btn {
             padding: 14px 24px;
             border: none;
@@ -85,24 +120,81 @@
             font-weight: bold;
             cursor: pointer;
         }
+
+        .save-btn:hover {
+            opacity: 0.93;
+        }
+
+        .delete-btn {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            background: #c62828;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background: #8e0000;
+        }
+
+        .delete-form {
+            margin: 0;
+        }
+
+        .update-form {
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .right-actions {
+                width: 100%;
+                flex-direction: column;
+            }
+
+            .cancel-btn,
+            .save-btn,
+            .delete-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
     </style>
 </head>
 <body class="dashboard-page">
 
     <div class="topbar">
         <h1>Edit Scholarship</h1>
-        <a href="{{ url_for('view_scholarships') }}">Back to Manage Scholarships</a>
+        <a href="{{ url_for('admin_scholarships') }}">Back to Manage Scholarships</a>
     </div>
 
     <div class="form-page-wrapper">
 
         <div class="form-header-card">
             <h2>Update Scholarship</h2>
-            <p>Edit the deadline and status, then save your changes.</p>
+            <p>
+                Edit the scholarship details below. You can update the deadline,
+                change the status, or delete the scholarship.
+            </p>
         </div>
 
         <div class="scholarship-form-card">
-            <form method="POST" action="{{ url_for('edit_scholarship', id=scholarship.id) }}">
+
+            <!-- UPDATE FORM -->
+            <form method="POST"
+                  action="{{ url_for('edit_scholarship', id=scholarship.id) }}"
+                  class="update-form">
 
                 <div class="form-row">
                     <div class="form-group">
@@ -129,17 +221,30 @@
                 <div class="form-group">
                     <label for="status">Scholarship Status</label>
                     <select id="status" name="status" required>
-                        <option value="open" {% if scholarship.status == 'open' %}selected{% endif %}>Open</option>
-                        <option value="closed" {% if scholarship.status == 'closed' %}selected{% endif %}>Closed</option>
+                        <option value="Open" {% if scholarship.status == 'Open' %}selected{% endif %}>Open</option>
+                        <option value="Closed" {% if scholarship.status == 'Closed' %}selected{% endif %}>Closed</option>
                     </select>
                 </div>
 
                 <div class="form-actions">
-                    <a href="{{ url_for('view_scholarships') }}" class="cancel-btn">Cancel</a>
-                    <button type="submit" class="save-btn">Update Scholarship</button>
-                </div>
+                    <div></div>
 
+                    <div class="right-actions">
+                        <a href="{{ url_for('admin_scholarships') }}" class="cancel-btn">Cancel</a>
+                        <button type="submit" class="save-btn">Update Scholarship</button>
+                    </div>
+                </div>
             </form>
+
+            <!-- DELETE FORM - completely separate -->
+            <form method="POST"
+                  action="{{ url_for('delete_scholarship', id=scholarship.id) }}"
+                  class="delete-form"
+                  onsubmit="return confirm('Are you sure you want to delete this scholarship?');"
+                  style="margin-top: 15px;">
+                <button type="submit" class="delete-btn">Delete Scholarship</button>
+            </form>
+
         </div>
 
     </div>

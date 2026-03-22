@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Scholarships</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            background: #132a13;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .site-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .topbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            flex-wrap: wrap;
+        }
+
+        .topbar-nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .topbar-nav a.active {
+            color: #90a955;
+            font-weight: bold;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #90a955;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
+        .profile-avatar svg {
+            width: 26px;
+            height: 26px;
+        }
+
+        .page {
+            padding: 30px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid #ddd;
+            margin-bottom: 30px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            color: #666;
+            border: none;
+            border-bottom: 3px solid transparent;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: #f1f8e9;
+            color: #31572c;
+            border-bottom: 3px solid #31572c;
+        }
+
+        .tab-btn:hover {
+            background: #f9f9f9;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+            padding: 20px;
+            display: none;
+        }
+
+        .card.active {
+            display: block;
+        }
+
+        .card h2 {
+            margin-top: 0;
+            color: #31572c;
+        }
+
+        label {
+            font-weight: bold;
+            color: #4f772d;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        button {
+            background: #90a955;
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .empty-state {
+            color: #666;
+            padding: 10px 0;
+        }
+
+        .scholarship-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .preview-card {
+            cursor: pointer;
+            background: #fff;
+            padding: 24px 14px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.2s ease;
+        }
+
+        .preview-card:hover {
+            background-color: #f1f8e9;
+        }
+
+        .preview-card:last-child {
+            border-bottom: none;
+        }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .dept-tag {
+            font-size: 0.85rem;
+            color: #4f772d;
+            font-weight: bold;
+        }
+
+        .card-title {
+            margin: 6px 0 8px 0;
+            color: #132a13;
+            font-size: 22px;
+        }
+
+        .card-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            margin-top: 8px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .card-meta strong {
+            color: #31572c;
+        }
+
+        .status-pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .status-open {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-closed {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .card-desc {
+            color: #666;
+            margin-top: 12px;
+            line-height: 1.6;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.55);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 40px auto;
+            padding: 25px;
+            width: 90%;
+            max-width: 850px;
+            border-radius: 18px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.16);
+        }
+
+        .close-btn {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .modal h2 {
+            color: #31572c;
+            margin-bottom: 10px;
+        }
+
+        .modal-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin: 12px 0 18px 0;
+            color: #555;
+        }
+
+        .modal-section {
+            margin-top: 20px;
+        }
+
+        .modal-section h4 {
+            color: #4f772d;
+            margin-bottom: 8px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 28px;
+        }
+
+        .edit-btn {
+            display: inline-block;
+            background: #90a955;
+            color: white;
+            text-decoration: none;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 900px) {
+            .card-top {
+                flex-direction: column;
+            }
+
+            .modal-content {
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body class="dashboard-page">
+    <div class="topbar">
+        <div class="topbar-left">
+            <div class="site-name">ScholarMates</div>
+
+            <div class="topbar-nav">
+                <a href="{{ url_for('admin_dashboard') }}">Home</a>
+                <a href="{{ url_for('admin_scholarships') }}" class="active">Scholarships</a>
+                <a href="{{ url_for('view_applications') }}">Submissions</a>
+                <a href="{{ url_for('manage_applications') }}">Review</a>
+                <a href="{{ url_for('admin_notifications') }}">Notifications</a>
+            </div>
+        </div>
+
+        <div class="topbar-right">
+            <a class="profile-avatar" href="{{ url_for('admin_dashboard') }}" aria-label="Admin Dashboard">
+                <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="32" cy="22" r="14" fill="#ffd54f" />
+                    <path d="M12 56c0-11 9-20 20-20s20 9 20 20" fill="#ffd54f" />
+                </svg>
+            </a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </div>
+
+    <div class="page">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openTab(event, 'view-tab')">Existing Scholarships</button>
+            <button class="tab-btn" onclick="openTab(event, 'create-tab')">Create New</button>
+        </div>
+
+        <div id="view-tab" class="card active">
+            
+
+            {% if scholarships %}
+                <div class="scholarship-grid">
+                    {% for s in scholarships %}
+                        <div class="preview-card"
+                             data-id="{{ s.id }}"
+                             data-title="{{ s.title }}"
+                             data-department="{{ s.department }}"
+                             data-level="{{ s.level_of_study }}"
+                             data-deadline="{{ s.deadline }}"
+                             data-status="{{ s.status }}"
+                             data-description="{{ s.description }}"
+                             data-requirements="{{ s.requirements }}"
+                             data-applicants="{{ s.applications|length }}"
+                             onclick="openDetailsModal(this)">
+
+                            <div class="card-top">
+                                
+                                    <div>
+                                        <div class="dept-tag">{{ s.department }}</div>
+                                        <div class="dept-tag" style="margin-top:4px;">{{ s.level_of_study }}</div>
+                                        <h3 class="card-title">{{ s.title }}</h3>
+                                    </div>
+                                <div>
+                                    <span class="status-pill {{ 'status-open' if s.status == 'Open' else 'status-closed' }}">
+                                        {{ s.status }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="card-meta">
+                                <span><strong>Applicants:</strong> {{ s.applications|length }}</span>
+                                <span><strong>Deadline:</strong> {{ s.deadline }}</span>
+                            </div>
+
+                            <p class="card-desc">
+                                {{ s.description|striptags|truncate(170) }}
+                            </p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="empty-state">No scholarships yet.</p>
+            {% endif %}
+        </div>
+
+        <div id="create-tab" class="card">
+            <h2>Create Scholarship</h2>
+            <form method="post">
+                <label>Title</label>
+                <input type="text" name="title" placeholder="e.g. Merit-Based Bursary" required>
+
+                <label>Department</label>
+                <select name="department" required class="form-control">
+                    <option value="" disabled selected>Select Department</option>
+                    <option value="Information Technology">Information Technology</option>
+                    <option value="Information Systems">Information Systems</option>
+                    <option value="Finance and Information Management">Finance and Information Management</option>
+                    <option value="Financial Accounting">Financial Accounting</option>
+                    <option value="Information and Corporate Management">Information and Corporate Management</option>
+                    <option value="Management Accounting">Management Accounting</option>
+                    <option value="Auditing and Taxation">Auditing and Taxation</option>
+                </select>
+                <label>Level of Study</label>
+                <select name="level_of_study" required>
+                    <option value="" disabled selected>Select Level of Study</option>
+                    <option value="Undergraduate">Undergraduate</option>
+                    <option value="Postgraduate">Postgraduate</option>
+                    <option value="Honors">Honors</option>
+                    <option value="Masters">Masters</option>
+                    <option value="PhD">PhD</option>
+                </select>
+
+                <label>Description</label>
+                <textarea name="description" rows="3" required></textarea>
+
+                <label>Requirements</label>
+                <textarea name="requirements" rows="3" required></textarea>
+
+                <label>Deadline</label>
+                <input type="date" name="deadline" required>
+
+                <label>Status</label>
+                <select name="status">
+                    <option value="Open">Open</option>
+                    <option value="Closed">Closed</option>
+                </select>
+
+                <button type="submit">Create Scholarship</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="detailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeDetailsModal()">&times;</span>
+
+            <h2 id="modalTitle"></h2>
+
+            <div class="modal-meta">
+                <span><strong>Department:</strong> <span id="modalDepartment"></span></span>
+                <span><strong>Level:</strong> <span id="modalLevel"></span></span>
+                <span><strong>Applicants:</strong> <span id="modalApplicants"></span></span>
+                <span><strong>Deadline:</strong> <span id="modalDeadline"></span></span>
+                <span><strong>Status:</strong> <span id="modalStatus"></span></span>
+            </div>
+
+            <div class="modal-section">
+                <h4>Description</h4>
+                <div id="modalDescription"></div>
+            </div>
+
+            <div class="modal-section">
+                <h4>Requirements</h4>
+                <div id="modalRequirements"></div>
+            </div>
+
+            <div class="modal-footer">
+                <a id="modalEditBtn" class="edit-btn" href="#">Edit Scholarship</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function openTab(evt, tabId) {
+        var content = document.getElementsByClassName("card");
+        for (var i = 0; i < content.length; i++) {
+            content[i].classList.remove("active");
+        }
+
+        var buttons = document.getElementsByClassName("tab-btn");
+        for (var i = 0; i < buttons.length; i++) {
+            buttons[i].classList.remove("active");
+        }
+
+        document.getElementById(tabId).classList.add("active");
+        evt.currentTarget.classList.add("active");
+    }
+
+    function openDetailsModal(card) {
+        document.getElementById('detailsModal').style.display = 'block';
+
+        document.getElementById('modalTitle').innerText = card.dataset.title || '';
+        document.getElementById('modalDepartment').innerText = card.dataset.department || '';
+        document.getElementById('modalLevel').innerText = card.dataset.level || '';
+        document.getElementById('modalApplicants').innerText = card.dataset.applicants || '0';
+        document.getElementById('modalDeadline').innerText = card.dataset.deadline || '';
+        document.getElementById('modalStatus').innerText = card.dataset.status || '';
+        document.getElementById('modalDescription').innerHTML = card.dataset.description || '';
+        document.getElementById('modalRequirements').innerHTML = card.dataset.requirements || '';
+        document.getElementById('modalEditBtn').href = '/edit_scholarship/' + card.dataset.id;
+    }
+
+    function closeDetailsModal() {
+        document.getElementById('detailsModal').style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        const modal = document.getElementById('detailsModal');
+        if (event.target === modal) {
+            closeDetailsModal();
+        }
+    }
+</script>
+</body>
+</html>

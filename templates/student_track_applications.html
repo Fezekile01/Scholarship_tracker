@@ -3,43 +3,859 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Applications</title>
+    <title>Track Applications</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
-        .table-wrapper { padding: 30px; }
-        .notice { margin-bottom: 16px; color: #1b5e20; font-weight: bold; }
-        table { width: 100%; border-collapse: collapse; background: white; }
-        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
-        th { background: #e8f5e9; color: #1b5e20; }
+        .page-wrap {
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            margin-bottom: 18px;
+        }
+
+        .page-title h2 {
+            color: #023e8a;
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .page-title p {
+            color: #666;
+            font-size: 15px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .site-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .topbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            flex-wrap: wrap;
+        }
+
+        .topbar-nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .topbar-nav a.active {
+            color: #ffd54f;
+            font-weight: bold;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #00b4d8;;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
+        .profile-avatar svg {
+            width: 26px;
+            height: 26px;
+        }
+
+        .filter-bar {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 25px;
+        }
+
+        .filter-bar input,
+        .filter-bar select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #d2d2d2;
+            border-radius: 10px;
+            font-size: 15px;
+            outline: none;
+            background: white;
+        }
+
+        .filter-bar input:focus,
+        .filter-bar select:focus {
+            border-color: #00b4d8;;
+            box-shadow: 0 0 6px rgba(251, 192, 45, 0.35);
+        }
+
+        .message-box {
+            background: #e8f5e9;
+            color: #1b5e20;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .applications-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+            gap: 18px;
+        }
+
+        .application-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+            border-left: 6px solid #00b4d8;
+            cursor: pointer;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+        }
+
+        .application-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 22px rgba(0,0,0,0.12);
+            background: #fcfffc;
+        }
+
+        .application-card h3 {
+            color: #1b5e20;
+            margin-bottom: 12px;
+            font-size: 21px;
+        }
+
+        .card-meta {
+            color: #555;
+            font-size: 14px;
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .status-chip {
+            display: inline-block;
+            margin-top: 6px;
+            padding: 7px 12px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .status-submitted {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .status-review {
+            background: #e8f1ff;
+            color: #1565c0;
+        }
+
+        .status-shortlisted {
+            background: #f3e5f5;
+            color: #6a1b9a;
+        }
+
+        .status-approved {
+            background: #edf7ed;
+            color: #2e7d32;
+        }
+
+        .status-rejected {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .status-incomplete {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+
+        .reason-text {
+            margin-top: 10px;
+            color: #c62828;
+            font-size: 14px;
+        }
+
+        .empty-state {
+            background: white;
+            padding: 20px;
+            border-radius: 14px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+            color: #555;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.55);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 30px auto;
+            padding: 25px;
+            width: 90%;
+            max-width: 1000px;
+            border-radius: 18px;
+        }
+
+        .close-btn {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .modal-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 8px;
+        }
+
+        .view-btn {
+            background: #1b5e20;
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .view-btn:hover {
+            opacity: 0.94;
+        }
+
+        .view-btn.secondary {
+            background: white;
+            color: #1b5e20;
+            border: 1px solid #1b5e20;
+        }
+
+        .readonly-section {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f9fff9;
+            border: 1px solid #dfe9df;
+            border-radius: 14px;
+        }
+
+        .readonly-section h3 {
+            color: #1b5e20;
+            margin-bottom: 15px;
+        }
+
+        .readonly-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .readonly-field {
+            margin-bottom: 12px;
+        }
+
+        .readonly-field.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .readonly-field label {
+            display: block;
+            font-weight: bold;
+            color: #1b5e20;
+            margin-bottom: 6px;
+        }
+
+        .readonly-value {
+            width: 100%;
+            min-height: 44px;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f7f7f7;
+            color: #444;
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+
+        .readonly-value.empty {
+            color: #999;
+            font-style: italic;
+        }
+
+        .doc-list {
+            margin-top: 10px;
+            padding-left: 18px;
+        }
+
+        @media (max-width: 900px) {
+            .filter-bar,
+            .readonly-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                width: 95%;
+            }
+
+            .topbar-left,
+            .topbar-nav,
+            .topbar-right {
+                width: 100%;
+            }
+
+            .modal-header-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
     </style>
+
+    <script>
+        function formatStatusClass(status) {
+            const value = (status || '').toLowerCase();
+            if (value === 'submitted') return 'status-submitted';
+            if (value === 'under review') return 'status-review';
+            if (value === 'shortlisted') return 'status-shortlisted';
+            if (value === 'approved') return 'status-approved';
+            if (value === 'rejected') return 'status-rejected';
+            if (value === 'incomplete') return 'status-incomplete';
+            return '';
+        }
+
+        function setReadonlyValue(id, value) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            if (value && String(value).trim() !== '') {
+                el.textContent = value;
+                el.classList.remove('empty');
+            } else {
+                el.textContent = 'Not provided';
+                el.classList.add('empty');
+            }
+        }
+
+        function openDetailsModal(card) {
+            document.getElementById('detailsModal').style.display = 'block';
+
+            document.getElementById('modalScholarshipTitle').innerText = card.dataset.scholarshipTitle || '';
+            document.getElementById('modalScholarshipDescription').innerHTML = card.dataset.scholarshipDescription || '';
+            document.getElementById('modalScholarshipRequirements').innerHTML = card.dataset.scholarshipRequirements || '';
+            document.getElementById('modalApplicationStatus').innerText = card.dataset.applicationStatus || '';
+            document.getElementById('modalDateSubmitted').innerText = card.dataset.submittedAt || '-';
+
+            const reasonWrap = document.getElementById('modalReasonWrap');
+            const reasonText = document.getElementById('modalReasonText');
+            if ((card.dataset.reason || '').trim() !== '') {
+                reasonWrap.style.display = 'block';
+                reasonText.textContent = card.dataset.reason;
+            } else {
+                reasonWrap.style.display = 'none';
+                reasonText.textContent = '';
+            }
+
+            document.getElementById('openViewApplicationBtn').onclick = function() {
+                openApplicationModal(card);
+            };
+        }
+
+        function closeDetailsModal() {
+            document.getElementById('detailsModal').style.display = 'none';
+        }
+
+        function openApplicationModal(card) {
+            closeDetailsModal();
+            document.getElementById('applicationModal').style.display = 'block';
+
+            setReadonlyValue('view_full_name', card.dataset.formFullName);
+            setReadonlyValue('view_date_of_birth', card.dataset.formDateOfBirth);
+            setReadonlyValue('view_nationality', card.dataset.formNationality);
+            setReadonlyValue('view_country_of_residence', card.dataset.formCountryOfResidence);
+            setReadonlyValue('view_email', card.dataset.formEmail);
+            setReadonlyValue('view_phone_number', card.dataset.formPhoneNumber);
+            setReadonlyValue('view_mailing_address', card.dataset.formMailingAddress);
+            setReadonlyValue('view_linkedin_url', card.dataset.formLinkedinUrl);
+            setReadonlyValue('view_portfolio_url', card.dataset.formPortfolioUrl);
+            setReadonlyValue('view_is_phd_student', card.dataset.formIsPhdStudent);
+            setReadonlyValue('view_orcid_id', card.dataset.formOrcidId);
+
+            setReadonlyValue('view_current_highest_degree', card.dataset.formCurrentHighestDegree);
+            setReadonlyValue('view_current_degree_title', card.dataset.formCurrentDegreeTitle);
+            setReadonlyValue('view_current_institution_name', card.dataset.formCurrentInstitutionName);
+            setReadonlyValue('view_current_location', card.dataset.formCurrentLocation);
+            setReadonlyValue('view_current_dates_attended', card.dataset.formCurrentDatesAttended);
+            setReadonlyValue('view_current_gpa_grade', card.dataset.formCurrentGpaGrade);
+            setReadonlyValue('view_thesis_dissertation_title', card.dataset.formThesisDissertationTitle);
+            setReadonlyValue('view_supervisor_name', card.dataset.formSupervisorName);
+            setReadonlyValue('view_previous_degree', card.dataset.formPreviousDegree);
+            setReadonlyValue('view_previous_degree_title', card.dataset.formPreviousDegreeTitle);
+            setReadonlyValue('view_previous_institution_name', card.dataset.formPreviousInstitutionName);
+            setReadonlyValue('view_previous_location', card.dataset.formPreviousLocation);
+            setReadonlyValue('view_previous_dates_attended', card.dataset.formPreviousDatesAttended);
+
+            setReadonlyValue('view_program_applying_for', card.dataset.formProgramApplyingFor);
+            setReadonlyValue('view_proposed_level_of_study', card.dataset.formProposedLevelOfStudy);
+            setReadonlyValue('view_proposed_program_title', card.dataset.formProposedProgramTitle);
+            setReadonlyValue('view_proposed_universities', card.dataset.formProposedUniversities);
+            setReadonlyValue('view_proposed_start_date', card.dataset.formProposedStartDate);
+            setReadonlyValue('view_anticipated_completion_date', card.dataset.formAnticipatedCompletionDate);
+            setReadonlyValue('view_proposed_thesis_title', card.dataset.formProposedThesisTitle);
+            setReadonlyValue('view_research_question_aim', card.dataset.formResearchQuestionAim);
+            setReadonlyValue('view_proposed_methodology', card.dataset.formProposedMethodology);
+            setReadonlyValue('view_significance_expected_outcomes', card.dataset.formSignificanceExpectedOutcomes);
+            setReadonlyValue('view_potential_supervisors', card.dataset.formPotentialSupervisors);
+            setReadonlyValue('view_motivation', card.dataset.formMotivation);
+            setReadonlyValue('view_career_goals', card.dataset.formCareerGoals);
+            setReadonlyValue('view_why_this_program_university', card.dataset.formWhyThisProgramUniversity);
+            setReadonlyValue('view_why_you', card.dataset.formWhyYou);
+            setReadonlyValue('view_relevant_experiences', card.dataset.formRelevantExperiences);
+
+            setReadonlyValue('view_work_experience', card.dataset.formWorkExperience);
+            setReadonlyValue('view_research_experience', card.dataset.formResearchExperience);
+            setReadonlyValue('view_publications_presentations', card.dataset.formPublicationsPresentations);
+            setReadonlyValue('view_volunteering_extracurricular', card.dataset.formVolunteeringExtracurricular);
+            setReadonlyValue('view_awards_prizes', card.dataset.formAwardsPrizes);
+            setReadonlyValue('view_skills_languages', card.dataset.formSkillsLanguages);
+
+            setReadonlyValue('view_ref1_name_title', card.dataset.formRef1NameTitle);
+            setReadonlyValue('view_ref1_institution', card.dataset.formRef1Institution);
+            setReadonlyValue('view_ref1_department', card.dataset.formRef1Department);
+            setReadonlyValue('view_ref1_email', card.dataset.formRef1Email);
+            setReadonlyValue('view_ref1_phone', card.dataset.formRef1Phone);
+            setReadonlyValue('view_ref1_relationship', card.dataset.formRef1Relationship);
+            setReadonlyValue('view_ref1_known_duration', card.dataset.formRef1KnownDuration);
+
+            setReadonlyValue('view_ref2_name_title', card.dataset.formRef2NameTitle);
+            setReadonlyValue('view_ref2_institution', card.dataset.formRef2Institution);
+            setReadonlyValue('view_ref2_department', card.dataset.formRef2Department);
+            setReadonlyValue('view_ref2_email', card.dataset.formRef2Email);
+            setReadonlyValue('view_ref2_phone', card.dataset.formRef2Phone);
+            setReadonlyValue('view_ref2_relationship', card.dataset.formRef2Relationship);
+            setReadonlyValue('view_ref2_known_duration', card.dataset.formRef2KnownDuration);
+
+            setReadonlyValue('view_ref3_name_title', card.dataset.formRef3NameTitle);
+            setReadonlyValue('view_ref3_institution', card.dataset.formRef3Institution);
+            setReadonlyValue('view_ref3_department', card.dataset.formRef3Department);
+            setReadonlyValue('view_ref3_email', card.dataset.formRef3Email);
+            setReadonlyValue('view_ref3_phone', card.dataset.formRef3Phone);
+            setReadonlyValue('view_ref3_relationship', card.dataset.formRef3Relationship);
+            setReadonlyValue('view_ref3_known_duration', card.dataset.formRef3KnownDuration);
+
+            setReadonlyValue('view_attachments_summary', card.dataset.formAttachmentsSummary);
+        }
+
+        function closeApplicationModal() {
+            document.getElementById('applicationModal').style.display = 'none';
+        }
+
+        function filterAndSortApplications() {
+            const searchValue = document.getElementById('searchInput').value.toLowerCase().trim();
+            const sortValue = document.getElementById('sortDate').value;
+            const filterValue = document.getElementById('filterStatus').value.toLowerCase();
+
+            const grid = document.getElementById('applicationsGrid');
+            const cards = Array.from(grid.querySelectorAll('.application-card'));
+
+            cards.forEach(card => {
+                const title = (card.dataset.scholarshipTitle || '').toLowerCase();
+                const status = (card.dataset.applicationStatus || '').toLowerCase();
+
+                const matchesSearch = title.includes(searchValue);
+                const matchesFilter = !filterValue || status === filterValue;
+
+                card.style.display = (matchesSearch && matchesFilter) ? 'block' : 'none';
+            });
+
+            const visibleCards = cards.filter(card => card.style.display !== 'none');
+
+            visibleCards.sort((a, b) => {
+                const dateA = new Date(a.dataset.submittedIso);
+                const dateB = new Date(b.dataset.submittedIso);
+
+                if (sortValue === 'date_oldest') {
+                    return dateA - dateB;
+                }
+                return dateB - dateA;
+            });
+
+            visibleCards.forEach(card => grid.appendChild(card));
+        }
+
+        window.onclick = function(event) {
+            const detailsModal = document.getElementById('detailsModal');
+            const applicationModal = document.getElementById('applicationModal');
+
+            if (event.target === detailsModal) {
+                detailsModal.style.display = 'none';
+            }
+
+            if (event.target === applicationModal) {
+                applicationModal.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('searchInput');
+            const sortDate = document.getElementById('sortDate');
+            const filterStatus = document.getElementById('filterStatus');
+
+            if (searchInput) searchInput.addEventListener('input', filterAndSortApplications);
+            if (sortDate) sortDate.addEventListener('change', filterAndSortApplications);
+            if (filterStatus) filterStatus.addEventListener('change', filterAndSortApplications);
+        });
+    </script>
 </head>
 <body class="dashboard-page">
     <div class="topbar">
-        <h1>My Applications</h1>
-        <a href="{{ url_for('student_dashboard') }}">Back to Dashboard</a>
+        <div class="topbar-left">
+            <div class="site-name">ScholarMates</div>
+
+            <div class="topbar-nav">
+                <a href="{{ url_for('student_dashboard') }}">Home</a>
+                <a href="{{ url_for('track_applications') }}" class="active">Track</a>
+                <a href="{{ url_for('student_scholarships') }}">Scholarships</a>
+                <a href="{{ url_for('student_notifications') }}">Notifications</a>
+            </div>
+        </div>
+
+        <div class="topbar-right">
+            <a class="profile-avatar" href="{{ url_for('student_profile') }}" aria-label="Student Profile">
+                <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="32" cy="22" r="14" fill="#ffd54f" />
+                    <path d="M12 56c0-11 9-20 20-20s20 9 20 20" fill="#ffd54f" />
+                </svg>
+            </a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
     </div>
 
-    <div class="table-wrapper">
+    <div class="page-wrap">
+        <div class="page-title">
+            <h2>Track Applications</h2>
+            <p>View your submitted applications and check the progress of each one.</p>
+        </div>
+
         {% if message %}
-            <div class="notice">{{ message }}</div>
+            <div class="message-box">{{ message }}</div>
         {% endif %}
 
+        <div class="filter-bar">
+            <input type="text" id="searchInput" placeholder="Search by scholarship name">
+
+            <select id="sortDate">
+                <option value="date_newest">Sort by date submitted: newest first</option>
+                <option value="date_oldest">Sort by date submitted: oldest first</option>
+            </select>
+
+            <select id="filterStatus">
+                <option value="">Filter by status</option>
+                <option value="submitted">Submitted</option>
+                <option value="under review">Under Review</option>
+                <option value="shortlisted">Shortlisted</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+                <option value="incomplete">Incomplete</option>
+            </select>
+        </div>
+
         {% if applications %}
-            <table>
-                <tr>
-                    <th>Scholarship</th>
-                    <th>Status</th>
-                </tr>
+            <div class="applications-grid" id="applicationsGrid">
                 {% for application in applications %}
-                <tr>
-                    <td>{{ application.scholarship.title }}</td>
-                    <td>{{ application.status }}</td>
-                </tr>
+                    {% set form = application.form %}
+                    <div class="application-card"
+                         data-scholarship-title="{{ application.scholarship.title }}"
+                         data-scholarship-description="{{ application.scholarship.description }}"
+                         data-scholarship-requirements="{{ application.scholarship.requirements }}"
+                         data-application-status="{{ application.status }}"
+                         data-reason="{{ application.reason or '' }}"
+                         data-submitted-at="{{ application.submitted_at.strftime('%d/%m/%Y %H:%M') if application.submitted_at else '-' }}"
+                         data-submitted-iso="{{ application.submitted_at.isoformat() if application.submitted_at else '' }}"
+
+                         data-form-full-name="{{ form.full_name if form else '' }}"
+                         data-form-date-of-birth="{{ form.date_of_birth if form and form.date_of_birth else '' }}"
+                         data-form-nationality="{{ form.nationality if form else '' }}"
+                         data-form-country-of-residence="{{ form.country_of_residence if form else '' }}"
+                         data-form-email="{{ form.email if form else '' }}"
+                         data-form-phone-number="{{ form.phone_number if form else '' }}"
+                         data-form-mailing-address="{{ form.mailing_address if form else '' }}"
+                         data-form-linkedin-url="{{ form.linkedin_url if form else '' }}"
+                         data-form-portfolio-url="{{ form.portfolio_url if form else '' }}"
+                         data-form-is-phd-student="{{ 'Yes' if form and form.is_phd_student else 'No' }}"
+                         data-form-orcid-id="{{ form.orcid_id if form else '' }}"
+
+                         data-form-current-highest-degree="{{ form.current_highest_degree if form else '' }}"
+                         data-form-current-degree-title="{{ form.current_degree_title if form else '' }}"
+                         data-form-current-institution-name="{{ form.current_institution_name if form else '' }}"
+                         data-form-current-location="{{ form.current_location if form else '' }}"
+                         data-form-current-dates-attended="{{ form.current_dates_attended if form else '' }}"
+                         data-form-current-gpa-grade="{{ form.current_gpa_grade if form else '' }}"
+                         data-form-thesis-dissertation-title="{{ form.thesis_dissertation_title if form else '' }}"
+                         data-form-supervisor-name="{{ form.supervisor_name if form else '' }}"
+                         data-form-previous-degree="{{ form.previous_degree if form else '' }}"
+                         data-form-previous-degree-title="{{ form.previous_degree_title if form else '' }}"
+                         data-form-previous-institution-name="{{ form.previous_institution_name if form else '' }}"
+                         data-form-previous-location="{{ form.previous_location if form else '' }}"
+                         data-form-previous-dates-attended="{{ form.previous_dates_attended if form else '' }}"
+
+                         data-form-program-applying-for="{{ form.program_applying_for if form else '' }}"
+                         data-form-proposed-level-of-study="{{ form.proposed_level_of_study if form else '' }}"
+                         data-form-proposed-program-title="{{ form.proposed_program_title if form else '' }}"
+                         data-form-proposed-universities="{{ form.proposed_universities if form else '' }}"
+                         data-form-proposed-start-date="{{ form.proposed_start_date if form else '' }}"
+                         data-form-anticipated-completion-date="{{ form.anticipated_completion_date if form else '' }}"
+                         data-form-proposed-thesis-title="{{ form.proposed_thesis_title if form else '' }}"
+                         data-form-research-question-aim="{{ form.research_question_aim if form else '' }}"
+                         data-form-proposed-methodology="{{ form.proposed_methodology if form else '' }}"
+                         data-form-significance-expected-outcomes="{{ form.significance_expected_outcomes if form else '' }}"
+                         data-form-potential-supervisors="{{ form.potential_supervisors if form else '' }}"
+                         data-form-motivation="{{ form.motivation if form else '' }}"
+                         data-form-career-goals="{{ form.career_goals if form else '' }}"
+                         data-form-why-this-program-university="{{ form.why_this_program_university if form else '' }}"
+                         data-form-why-you="{{ form.why_you if form else '' }}"
+                         data-form-relevant-experiences="{{ form.relevant_experiences if form else '' }}"
+
+                         data-form-work-experience="{{ form.work_experience if form else '' }}"
+                         data-form-research-experience="{{ form.research_experience if form else '' }}"
+                         data-form-publications-presentations="{{ form.publications_presentations if form else '' }}"
+                         data-form-volunteering-extracurricular="{{ form.volunteering_extracurricular if form else '' }}"
+                         data-form-awards-prizes="{{ form.awards_prizes if form else '' }}"
+                         data-form-skills-languages="{{ form.skills_languages if form else '' }}"
+
+                         data-form-ref1-name-title="{{ form.ref1_name_title if form else '' }}"
+                         data-form-ref1-institution="{{ form.ref1_institution if form else '' }}"
+                         data-form-ref1-department="{{ form.ref1_department if form else '' }}"
+                         data-form-ref1-email="{{ form.ref1_email if form else '' }}"
+                         data-form-ref1-phone="{{ form.ref1_phone if form else '' }}"
+                         data-form-ref1-relationship="{{ form.ref1_relationship if form else '' }}"
+                         data-form-ref1-known-duration="{{ form.ref1_known_duration if form else '' }}"
+
+                         data-form-ref2-name-title="{{ form.ref2_name_title if form else '' }}"
+                         data-form-ref2-institution="{{ form.ref2_institution if form else '' }}"
+                         data-form-ref2-department="{{ form.ref2_department if form else '' }}"
+                         data-form-ref2-email="{{ form.ref2_email if form else '' }}"
+                         data-form-ref2-phone="{{ form.ref2_phone if form else '' }}"
+                         data-form-ref2-relationship="{{ form.ref2_relationship if form else '' }}"
+                         data-form-ref2-known-duration="{{ form.ref2_known_duration if form else '' }}"
+
+                         data-form-ref3-name-title="{{ form.ref3_name_title if form else '' }}"
+                         data-form-ref3-institution="{{ form.ref3_institution if form else '' }}"
+                         data-form-ref3-department="{{ form.ref3_department if form else '' }}"
+                         data-form-ref3-email="{{ form.ref3_email if form else '' }}"
+                         data-form-ref3-phone="{{ form.ref3_phone if form else '' }}"
+                         data-form-ref3-relationship="{{ form.ref3_relationship if form else '' }}"
+                         data-form-ref3-known-duration="{{ form.ref3_known_duration if form else '' }}"
+
+                         data-form-attachments-summary="{{ form.attachments_summary if form else '' }}"
+                         onclick="openDetailsModal(this)">
+
+                        <h3>{{ application.scholarship.title }}</h3>
+
+                        <div class="card-meta">
+                            <strong>Date Submitted:</strong>
+                            {{ application.submitted_at.strftime('%d/%m/%Y %H:%M') if application.submitted_at else '-' }}
+                        </div>
+
+                        <div class="card-meta">
+                            <strong>Status:</strong>
+                            <span class="status-chip {{ 'status-submitted' if application.status == 'Submitted'
+                                else 'status-review' if application.status == 'Under Review'
+                                else 'status-shortlisted' if application.status == 'Shortlisted'
+                                else 'status-approved' if application.status == 'Approved'
+                                else 'status-rejected' if application.status == 'Rejected'
+                                else 'status-incomplete' if application.status == 'Incomplete'
+                                else '' }}">
+                                {{ application.status }}
+                            </span>
+                        </div>
+
+                        {% if application.reason %}
+                            <div class="reason-text">
+                                <strong>Reason:</strong> {{ application.reason }}
+                            </div>
+                        {% endif %}
+                    </div>
                 {% endfor %}
-            </table>
+            </div>
         {% else %}
-            <p>You have not submitted any applications yet.</p>
+            <div class="empty-state">You have not submitted any applications yet.</div>
         {% endif %}
+    </div>
+
+    <!-- MODAL 1: Scholarship / Application Details -->
+    <div id="detailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeDetailsModal()">&times;</span>
+
+            <div class="modal-header-row">
+                <h2 id="modalScholarshipTitle" style="color:#023e8a; margin:0;"></h2>
+                <button type="button" class="view-btn" id="openViewApplicationBtn">View Application</button>
+            </div>
+
+            <hr style="margin: 16px 0;">
+
+            <p><strong>Date Submitted:</strong> <span id="modalDateSubmitted"></span></p>
+            <p><strong>Status:</strong> <span id="modalApplicationStatus"></span></p>
+
+            <div id="modalReasonWrap" style="display:none; margin-top: 12px;">
+                <p><strong>Reason:</strong></p>
+                <div id="modalReasonText" class="readonly-value"></div>
+            </div>
+
+            <h4 style="margin-top: 20px;">Scholarship Description</h4>
+            <div id="modalScholarshipDescription" style="margin-bottom: 20px;"></div>
+
+            <h4>Scholarship Requirements</h4>
+            <div id="modalScholarshipRequirements"></div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: View Filled Application -->
+    <div id="applicationModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeApplicationModal()">&times;</span>
+
+            <h2 style="color:#1b5e20;">Submitted Application</h2>
+            <p>This is a read-only view of your application form.</p>
+
+            <div class="readonly-section">
+                <h3>Part 1: Personal Information</h3>
+                <div class="readonly-grid">
+                    <div class="readonly-field"><label>Full Name</label><div id="view_full_name" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Date of Birth</label><div id="view_date_of_birth" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Nationality / Citizenship</label><div id="view_nationality" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Country of Residence</label><div id="view_country_of_residence" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Email</label><div id="view_email" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Phone Number</label><div id="view_phone_number" class="readonly-value"></div></div>
+                    <div class="readonly-field full-width"><label>Mailing Address</label><div id="view_mailing_address" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>LinkedIn URL</label><div id="view_linkedin_url" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Portfolio URL</label><div id="view_portfolio_url" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Are you a PhD student?</label><div id="view_is_phd_student" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>ORCID iD</label><div id="view_orcid_id" class="readonly-value"></div></div>
+                </div>
+            </div>
+
+            <div class="readonly-section">
+                <h3>Part 2: Academic Background</h3>
+                <div class="readonly-grid">
+                    <div class="readonly-field"><label>Current / Highest Degree</label><div id="view_current_highest_degree" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Degree Title</label><div id="view_current_degree_title" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Institution Name</label><div id="view_current_institution_name" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Location</label><div id="view_current_location" class="readonly-value"></div></div>
+                    <div class="readonly-field full-width"><label>Dates Attended</label><div id="view_current_dates_attended" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>GPA / Grade</label><div id="view_current_gpa_grade" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Thesis / Dissertation Title</label><div id="view_thesis_dissertation_title" class="readonly-value"></div></div>
+                    <div class="readonly-field full-width"><label>Supervisor's Name</label><div id="view_supervisor_name" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Previous Degree</label><div id="view_previous_degree" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Previous Degree Title</label><div id="view_previous_degree_title" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Previous Institution Name</label><div id="view_previous_institution_name" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Previous Location</label><div id="view_previous_location" class="readonly-value"></div></div>
+                    <div class="readonly-field full-width"><label>Previous Dates Attended</label><div id="view_previous_dates_attended" class="readonly-value"></div></div>
+                </div>
+            </div>
+
+            <div class="readonly-section">
+                <h3>Part 3: Proposed Course of Study</h3>
+                <div class="readonly-grid">
+                    <div class="readonly-field"><label>Program Applying For</label><div id="view_program_applying_for" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Level of Study</label><div id="view_proposed_level_of_study" class="readonly-value"></div></div>
+                    <div class="readonly-field full-width"><label>Proposed Program Title</label><div id="view_proposed_program_title" class="readonly-value"></div></div>
+                    <div class="readonly-field full-width"><label>Proposed Universities</label><div id="view_proposed_universities" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Proposed Start Date</label><div id="view_proposed_start_date" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Anticipated Completion Date</label><div id="view_anticipated_completion_date" class="readonly-value"></div></div>
+                    <div class="readonly-field full-width"><label>Proposed Thesis Title</label><div id="view_proposed_thesis_title" class="readonly-value"></div></div>
+                    <div class="readonly-field full-width"><label>Research Question / Aim</label><div id="view_research_question_aim" class="readonly-value"></div></div>
+                    <div class="readonly-field full-width"><label>Proposed Methodology</label><div id="view_proposed_methodology" class="readonly-value"></div></div>
+                    <div class="readonly-field full-width"><label>Significance / Expected Outcomes</label><div id="view_significance_expected_outcomes" class="readonly-value"></div></div>
+                    <div class="readonly-field full-width"><label>Potential Supervisors</label><div id="view_potential_supervisors" class="readonly-value"></div></div>
+                    <div class="readonly-field full-width"><label>Motivation</label><div id="view_motivation" class="readonly-value"></div></div>
+                    <div class="readonly-field full-width"><label>Career Goals</label><div id="view_career_goals" class="readonly-value"></div></div>
+                    <div class="readonly-field full-width"><label>Why This Program / University?</label><div id="view_why_this_program_university" class="readonly-value"></div></div>
+                    <div class="readonly-field full-width"><label>Why You?</label><div id="view_why_you" class="readonly-value"></div></div>
+                    <div class="readonly-field full-width"><label>Relevant Experiences</label><div id="view_relevant_experiences" class="readonly-value"></div></div>
+                </div>
+            </div>
+
+            <div class="readonly-section">
+                <h3>Part 4: Supporting Information</h3>
+                <div class="readonly-grid">
+                    <div class="readonly-field full-width"><label>Work Experience</label><div id="view_work_experience" class="readonly-value"></div></div>
+                    <div class="readonly-field full-width"><label>Research Experience</label><div id="view_research_experience" class="readonly-value"></div></div>
+                    <div class="readonly-field full-width"><label>Publications / Presentations</label><div id="view_publications_presentations" class="readonly-value"></div></div>
+                    <div class="readonly-field full-width"><label>Volunteering & Extracurricular</label><div id="view_volunteering_extracurricular" class="readonly-value"></div></div>
+                    <div class="readonly-field full-width"><label>Awards / Prizes</label><div id="view_awards_prizes" class="readonly-value"></div></div>
+                    <div class="readonly-field full-width"><label>Skills / Languages</label><div id="view_skills_languages" class="readonly-value"></div></div>
+                </div>
+            </div>
+
+            <div class="readonly-section">
+                <h3>Part 5: Referees</h3>
+                <div class="readonly-grid">
+                    <div class="readonly-field"><label>Referee 1 Name & Title</label><div id="view_ref1_name_title" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Institution</label><div id="view_ref1_institution" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Department</label><div id="view_ref1_department" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Email</label><div id="view_ref1_email" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Phone</label><div id="view_ref1_phone" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Relationship</label><div id="view_ref1_relationship" class="readonly-value"></div></div>
+                    <div class="readonly-field full-width"><label>How long known</label><div id="view_ref1_known_duration" class="readonly-value"></div></div>
+
+                    <div class="readonly-field"><label>Referee 2 Name & Title</label><div id="view_ref2_name_title" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Institution</label><div id="view_ref2_institution" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Department</label><div id="view_ref2_department" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Email</label><div id="view_ref2_email" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Phone</label><div id="view_ref2_phone" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Relationship</label><div id="view_ref2_relationship" class="readonly-value"></div></div>
+                    <div class="readonly-field full-width"><label>How long known</label><div id="view_ref2_known_duration" class="readonly-value"></div></div>
+
+                    <div class="readonly-field"><label>Referee 3 Name & Title</label><div id="view_ref3_name_title" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Institution</label><div id="view_ref3_institution" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Department</label><div id="view_ref3_department" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Email</label><div id="view_ref3_email" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Phone</label><div id="view_ref3_phone" class="readonly-value"></div></div>
+                    <div class="readonly-field"><label>Relationship</label><div id="view_ref3_relationship" class="readonly-value"></div></div>
+                    <div class="readonly-field full-width"><label>How long known</label><div id="view_ref3_known_duration" class="readonly-value"></div></div>
+                </div>
+            </div>
+
+            <div class="readonly-section">
+                <h3>Part 6: Supporting Documents</h3>
+                <div class="readonly-field full-width">
+                    <label>Attached Documents Summary</label>
+                    <div id="view_attachments_summary" class="readonly-value"></div>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 </html>
